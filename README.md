@@ -31,7 +31,7 @@ assert u"FOOBAR".lower() == "foobar"
 ## python can add numbers
 
 ```python
-assert (2 + 2) == 5, 'oops baby'
+assert (2 + 2) == 4, 'oops baby'
 ```
 
 # Start using steady mark now!

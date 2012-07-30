@@ -65,6 +65,10 @@ class READMETestRunner(BaseRenderer):
         print "\033[1;32m{0}\033[0m".format(text)
 
     def format_ms(self, ms):
+        ms = int(ms)
+        if ms < 1000:
+            return ""
+
         return "\033[1;33m{0}ms\033[0m".format(ms)
 
     def postprocess(self, full_document):
