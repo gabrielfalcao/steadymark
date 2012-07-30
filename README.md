@@ -1,5 +1,5 @@
 # Steady Mark
-> version 0.1.2
+> version 0.1.3
 [![Build Status](https://secure.travis-ci.org/gabrielfalcao/steadymark.png)](http://travis-ci.org/gabrielfalcao/steadymark)
 
 # Turning your github readme files into python test suites since 2012
@@ -65,5 +65,5 @@ $ steadymark README.md
 
 ```python
 from steadymark import version
-assert version == '0.1.2'
+assert version == '0.1.3'
 ```
