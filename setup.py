@@ -1,6 +1,6 @@
 # #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# <steadymark - assertion toolbox>
+# <steadymark - markdown-based test runner for python>
 # Copyright (C) <2010>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # Permission is hereby granted, free of charge, to any person
@@ -40,7 +40,8 @@ def get_packages():
 
 setup(name='steadymark',
     version=version,
-    description='assertion toolbox for python',
+    description=(u'Markdown-based test runner for python. '
+                 'Good for github projects'),
     author=u'Gabriel Falcao',
     author_email='gabriel@nacaolivre.org',
     url='http://github.com/gabrielfalcao/steadymark',

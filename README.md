@@ -1,7 +1,7 @@
 # Steady Mark
 [![Build Status](https://secure.travis-ci.org/gabrielfalcao/steadymark.png)](http://travis-ci.org/gabrielfalcao/steadymark)
 
-# Markdown files + python snippets = regression tests
+# Turning your github readme files into python test suites since 2012
 
 Steady Mark was created for python developers that love Github and
 markdown.
