@@ -110,32 +110,23 @@ class READMETestRunner(BaseRenderer):
 
 
 def main():
-    import argparse
+    from optparse import OptionParser
 
-    parser = argparse.ArgumentParser(
-        description=(u'Use python code snippets from your README.md or '
-                     'any markdown files as regression tests'),
-    )
-    parser.add_argument(
-        'filename',
-        metavar='FILENAME.md',
-        type=unicode,
-        nargs='*',
-        default='README.md',
-        help='the path to a markdown file to be inspected for tests',
-    )
-    args = parser.parse_args()
+    parser = OptionParser()
+    (options, args) = parser.parse_args()
+    args = args or ['README.md']
 
-    renderer = READMETestRunner()
-    renderer.filename = args.filename
+    for filename in args:
+        renderer = READMETestRunner()
+        renderer.filename = filename
 
-    extensions = EXT_FENCED_CODE | EXT_NO_INTRA_EMPHASIS
-    md = Markdown(renderer, extensions=extensions)
-    if not os.path.exists(renderer.filename):
-        print 'steadymark could not find {0}'.format(renderer.filename)
-        sys.exit(1)
-    text = open(renderer.filename).read()
-    md.render(text)
+        extensions = EXT_FENCED_CODE | EXT_NO_INTRA_EMPHASIS
+        md = Markdown(renderer, extensions=extensions)
+        if not os.path.exists(renderer.filename):
+            print 'steadymark could not find {0}'.format(renderer.filename)
+            sys.exit(1)
+        text = open(renderer.filename).read()
+        md.render(text)
 
 
 if __name__ == '__main__':
