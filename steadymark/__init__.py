@@ -24,7 +24,8 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-version = '0.1.1'
+version = '0.1.2'
+
 import os
 import sys
 import traceback
@@ -57,15 +58,25 @@ class READMETestRunner(BaseRenderer):
             u'title': unicode(title),
         })
 
+    def print_red(self, text):
+        print "\033[1;31m{0}\033[0m".format(text)
+
+    def print_green(self, text):
+        print "\033[1;32m{0}\033[0m".format(text)
+
+    def format_ms(self, ms):
+        return "\033[1;33m{0}ms\033[0m".format(ms)
+
     def postprocess(self, full_document):
         actual_tests = [t for t in self.tests if 'code' in t]
         if actual_tests:
-            print "Running code snippets from {0}".format(self.filename)
+            print "Running code snippets from {0}\n".format(self.filename)
         else:
             print "No tests found in {0}".format(self.filename)
 
+        failed = False
         for test in actual_tests:
-            sys.stdout.write("{0} ...".format(test['title']))
+            sys.stdout.write("{0} ".format(test['title']))
             before = datetime.now()
             failure = None
             lines = test['code'].splitlines()
@@ -80,15 +91,18 @@ class READMETestRunner(BaseRenderer):
             shift = before - after
             ms = shift.microseconds / 1000
             if not failure:
-                print "OK ({0}ms)".format(ms)
+                self.print_green('\xe2\x9c\x93 {0}'.format(self.format_ms(ms)))
             else:
-                print "Failed ({0}ms)".format(ms)
+                self.print_red('\xe2\x9c\x97 {0}'.format(self.format_ms(ms)))
+                failed = True
                 exc, name, tb = failure
                 tb = tb.tb_next
                 line = lines[tb.tb_lineno - 1]
-                print "Traceback (most recent call last):"
-                print "{0}     {1}".format(traceback.format_tb(tb)[-1], line)
-                # print u'  File README.md, line {0}'.format(tb.next)
+                self.print_red("Traceback (most recent call last):")
+                formatted_tb = traceback.format_tb(tb)[-1]
+                self.print_red("{0}     {1}".format(formatted_tb, line))
+
+        sys.exit(int(failed))
 
 
 def main():

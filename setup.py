@@ -25,7 +25,6 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 import os
-from steadymark import version
 from setuptools import setup
 
 
@@ -39,7 +38,7 @@ def get_packages():
     return packages
 
 setup(name='steadymark',
-    version=version,
+    version='0.1.2',
     description=(u'Markdown-based test runner for python. '
                  'Good for github projects'),
     author=u'Gabriel Falcao',
