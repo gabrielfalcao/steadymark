@@ -46,7 +46,7 @@ the code.
     ## unicode.lower transforms string into lowercase
 
     ```python
-    assert u"FOOBAR".lower() == "foobar"
+    assert u"Gabriel Falcão".lower() == "gabriel falcão"
     ```
 
     ## python can add numbers
@@ -61,9 +61,18 @@ Just run with:
 $ steadymark README.md
 ```
 
-# Steadymark tests itself :+1:
+# Steadymark is on version 0.1.3
 
 ```python
 from steadymark import version
 assert version == '0.1.3'
+```
+
+# Steadymark strips headers
+
+```python
+from sure import that
+from steadymark import Runner
+
+assert that(Runner(text='## test\n```python\nassert True\n```').run().tests).equals([{u'code': u'assert True', u'title': u'test'}])
 ```

@@ -25,10 +25,11 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 version = '0.1.3'
-
+import re
 import os
 import sys
 import traceback
+import codecs
 from datetime import datetime
 
 from misaka import (
@@ -40,29 +41,37 @@ from misaka import (
 
 
 class READMETestRunner(BaseRenderer):
-    tests = [{}]
     filename = None
+
+    def preprocess(self, text):
+        self._tests = [{}]
+        return unicode(text)
 
     def block_code(self, code, language):
         if language != 'python':
             return
 
-        item = self.tests[-1]
-        item[u'code'] = unicode(code)
+        item = self._tests[-1]
+        item[u'code'] = unicode(code).strip()
         if 'title' not in item:
-            item[u'title'] = u'Test #{0}'.format(len(self.tests))
-            self.tests.append({})
+            item[u'title'] = u'Test #{0}'.format(len(self._tests))
+            self._tests.append({})
 
     def header(self, title, level):
-        self.tests.append({
-            u'title': unicode(title),
+        t = unicode(title)
+        t = re.sub(ur'^[# ]*(.*)', '\g<1>', t)
+        t = re.sub(ur'`([^`]*)`', '\033[1;33m\g<1>\033[0m', t)
+        self._tests.append({
+            u'title': t,
         })
 
-    def print_red(self, text):
-        print "\033[1;31m{0}\033[0m".format(text)
+    def print_red(self, text, indentation=0):
+        for line in text.splitlines():
+            print "{1}\033[1;31m{0}\033[0m".format(line, ' ' * indentation)
 
-    def print_green(self, text):
-        print "\033[1;32m{0}\033[0m".format(text)
+    def print_green(self, text, indentation=0):
+        for line in text.splitlines():
+            print "{1}\033[1;32m{0}\033[0m".format(line, ' ' * indentation)
 
     def format_ms(self, ms):
         ms = int(ms)
@@ -71,8 +80,15 @@ class READMETestRunner(BaseRenderer):
 
         return "\033[1;33m{0}ms\033[0m".format(ms)
 
+    @property
+    def tests(self):
+        return [t for t in self._tests if 'code' in t]
+
     def postprocess(self, full_document):
-        actual_tests = [t for t in self.tests if 'code' in t]
+        if not self.filename:
+            return full_document
+
+        actual_tests = self.tests
         if actual_tests:
             print "Running code snippets from {0}\n".format(self.filename)
         else:
@@ -80,16 +96,19 @@ class READMETestRunner(BaseRenderer):
 
         failed = False
         for test in actual_tests:
-            sys.stdout.write("{0} ".format(test['title']))
+            raw_code = str(test['code'].encode('utf-8'))
+            title = str(test['title'].encode('utf-8'))
+            sys.stdout.write("{0} ".format(title))
             before = datetime.now()
             failure = None
-            lines = test['code'].splitlines()
-            try:
-                code = compile(test['code'], "README.md", "exec")
-                eval(code)
-            except Exception:
-                failure = sys.exc_info()
+            lines = raw_code.splitlines()
 
+            try:
+                code = compile(raw_code, "@STEADYMARK@", "exec")
+                eval(code)
+            except:
+                failure = sys.exc_info()
+                failed = True
             after = datetime.now()
 
             shift = before - after
@@ -98,15 +117,48 @@ class READMETestRunner(BaseRenderer):
                 self.print_green('\xe2\x9c\x93 {0}'.format(self.format_ms(ms)))
             else:
                 self.print_red('\xe2\x9c\x97 {0}'.format(self.format_ms(ms)))
-                failed = True
                 exc, name, tb = failure
                 tb = tb.tb_next
-                line = lines[tb.tb_lineno - 1]
-                self.print_red("Traceback (most recent call last):")
-                formatted_tb = traceback.format_tb(tb)[-1]
-                self.print_red("{0}     {1}".format(formatted_tb, line))
+                if tb:
+                    self.print_red(traceback.format_exc(exc))
+                    line = lines[tb.tb_lineno - 1]
+                    formatted_tb = traceback.format_exc(name)
+                    self.print_red("{0}     {1}".format(formatted_tb, line))
+                else:
+                    if issubclass(exc, SyntaxError):
+                        formatted_tb = traceback.format_exc(name)
+                        formatted_tb = formatted_tb.replace(
+                            'File "@STEADYMARK@',
+                            'In the test "@STEADYMARK@',
+                        )
+                        formatted_tb = formatted_tb.replace(
+                            '@STEADYMARK@', title)
+                        self.print_red(formatted_tb, indentation=2)
 
         sys.exit(int(failed))
+
+
+class Runner(object):
+    def __init__(self, filename=None, text=u''):
+        renderer = READMETestRunner()
+        renderer.filename = filename
+        extensions = EXT_FENCED_CODE | EXT_NO_INTRA_EMPHASIS
+
+        if filename and not os.path.exists(renderer.filename):
+            print 'steadymark could not find {0}'.format(renderer.filename)
+            sys.exit(1)
+
+        if filename:
+            raw_md = codecs.open(renderer.filename, 'rb', 'utf-8').read()
+            text = unicode(raw_md)
+
+        self.text = text
+        self.md = Markdown(renderer, extensions=extensions)
+        self.renderer = renderer
+
+    def run(self):
+        renderer = self.renderer
+        return self.md.render(self.text) and renderer or renderer
 
 
 def main():
@@ -117,17 +169,8 @@ def main():
     args = args or ['README.md']
 
     for filename in args:
-        renderer = READMETestRunner()
-        renderer.filename = filename
-
-        extensions = EXT_FENCED_CODE | EXT_NO_INTRA_EMPHASIS
-        md = Markdown(renderer, extensions=extensions)
-        if not os.path.exists(renderer.filename):
-            print 'steadymark could not find {0}'.format(renderer.filename)
-            sys.exit(1)
-        text = open(renderer.filename).read()
-        md.render(text)
-
+        runner = Runner(filename)
+        runner.run()
 
 if __name__ == '__main__':
     main()
