@@ -25,7 +25,8 @@ it will be used as title for your test.
 ## unicode.lower transforms string into lowercase
 
 ```python
-assert u"Gabriel Falcão".lower() == "gabriel falcão"
+from sure import that
+assert that(u"Gabriel Falcao".lower()).equals(u"gabriel falcao")
 ```
 
 ## python can add numbers
@@ -74,5 +75,8 @@ assert version == '0.1.4'
 from sure import that
 from steadymark import Runner
 
-assert that(Runner(text='## test\n```python\nassert True\n```').run().tests).equals([{u'code': u'assert True', u'title': u'test'}])
+tests = Runner(text='## test\n```python\nassert True\n```').run().tests
+assert that(tests).equals([{
+    u'code': u'assert True', u'title': u'test'
+}])
 ```
