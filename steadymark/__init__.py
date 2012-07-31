@@ -24,7 +24,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-version = '0.1.3'
+version = '0.1.4'
 import re
 import os
 import sys
@@ -117,26 +117,26 @@ class READMETestRunner(BaseRenderer):
                 self.print_green('\xe2\x9c\x93 {0}'.format(self.format_ms(ms)))
             else:
                 self.print_red('\xe2\x9c\x97 {0}'.format(self.format_ms(ms)))
-                exc, name, tb = failure
+                exc, exc_instance, tb = failure
                 tb = tb.tb_next
+                formatted_tb = self.format_traceback(title, exc_instance)
+
                 if tb:
-                    self.print_red(traceback.format_exc(exc))
                     line = lines[tb.tb_lineno - 1]
-                    formatted_tb = traceback.format_exc(name)
                     self.print_red("{0}     {1}".format(formatted_tb, line))
-                else:
-                    if issubclass(exc, SyntaxError):
-                        formatted_tb = traceback.format_exc(name)
-                        formatted_tb = formatted_tb.replace(
-                            'File "@STEADYMARK@',
-                            'In the test "@STEADYMARK@',
-                        )
-                        formatted_tb = formatted_tb.replace(
-                            '@STEADYMARK@', title)
-                        self.print_red(formatted_tb, indentation=2)
+                elif issubclass(exc, SyntaxError):
+                    self.print_red(formatted_tb, indentation=2)
 
         sys.exit(int(failed))
 
+    def format_traceback(self, title, exception):
+        formatted_tb = traceback.format_exc(exception)
+        formatted_tb = formatted_tb.replace(
+            'File "@STEADYMARK@',
+            'In the test "@STEADYMARK@',
+        )
+        return formatted_tb.replace(
+            '@STEADYMARK@', title)
 
 class Runner(object):
     def __init__(self, filename=None, text=u''):
