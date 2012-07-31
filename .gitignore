@@ -1,0 +1,4 @@
+dist/
+steadymark-0.1.4.tar.gz
+*egg-info
+*.pyc

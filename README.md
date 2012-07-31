@@ -1,6 +1,6 @@
 # Steady Mark
 > version 0.1.4
-[![Build Status](https://secure.travis-ci.org/gabrielfalcao/steadymark.png)](http://travis-ci.org/gabrielfalcao/steadymark)
+[![Build Status](https://secure.travis-ci.org/gabrielfalcao/steadymark.png?branch=master)](http://travis-ci.org/#!/gabrielfalcao/steadymark)
 
 # Turning your github readme files into python test suites since 2012
 
