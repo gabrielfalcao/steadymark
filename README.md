@@ -25,7 +25,7 @@ it will be used as title for your test.
 ## unicode.lower transforms string into lowercase
 
 ```python
-assert u"FOOBAR".lower() == "foobar"
+assert u"Gabriel Falcão".lower() == "gabriel falcão"
 ```
 
 ## python can add numbers
@@ -46,7 +46,7 @@ the code.
     ## unicode.lower transforms string into lowercase
 
     ```python
-    assert u"Gabriel Falcão".lower() == "gabriel falcão"
+    assert "LOWERCaSe".lower() == "lowercase"
     ```
 
     ## python can add numbers
