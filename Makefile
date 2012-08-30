@@ -4,8 +4,13 @@ filename=steadymark-`python -c 'import steadymark;print steadymark.version'`.tar
 
 export PYTHONPATH:=  ${PWD}
 
-test: clean
-	@echo "Running code examples from README.md as tests"
+test: clean unit functional
+
+unit:
+	@echo "Running unit tests"
+	@nosetests --verbosity=2 -s tests/unit
+
+functional:
 	@python steadymark/__init__.py
 
 clean:

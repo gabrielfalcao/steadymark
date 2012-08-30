@@ -31,6 +31,7 @@ import sys
 import traceback
 import codecs
 from datetime import datetime
+from collections import OrderedDict
 
 from misaka import (
     BaseRenderer,
@@ -138,6 +139,7 @@ class READMETestRunner(BaseRenderer):
         return formatted_tb.replace(
             '@STEADYMARK@', title)
 
+
 class Runner(object):
     def __init__(self, filename=None, text=u''):
         renderer = READMETestRunner()
@@ -159,6 +161,55 @@ class Runner(object):
     def run(self):
         renderer = self.renderer
         return self.md.render(self.text) and renderer or renderer
+
+
+class SteadyMark(BaseRenderer):
+    def preprocess(self, text):
+        self._tests = [{}]
+        return unicode(text)
+
+    def block_code(self, code, language):
+        if language != 'python':
+            return
+
+        item = self._tests[-1]
+        item[u'code'] = unicode(code).strip()
+        if 'title' not in item:
+            item[u'title'] = u'Test #{0}'.format(len(self._tests))
+            self._tests.append({})
+
+    def header(self, title, level):
+        t = unicode(title)
+        t = re.sub(ur'^[# ]*(.*)', '\g<1>', t)
+        t = re.sub(ur'`([^`]*)`', '\033[1;33m\g<1>\033[0m', t)
+        self._tests.append({
+            u'title': t,
+        })
+
+    def postprocess(self, full_document):
+        tests = []
+
+        for test in filter(lambda x: 'code' in x, self._tests):
+            raw_code = str(test['code'].encode('utf-8'))
+            title = str(test['title'].encode('utf-8'))
+            tests.append(MarkdownTest(title, raw_code))
+
+        self.tests = tests
+
+    @classmethod
+    def inspect(cls, markdown):
+        renderer = cls()
+        extensions = EXT_FENCED_CODE | EXT_NO_INTRA_EMPHASIS
+        md = Markdown(renderer, extensions=extensions)
+        md.render(markdown)
+        return renderer
+
+
+class MarkdownTest(object):
+    def __init__(self, title, raw_code):
+        self.title = title
+        self.raw_code = raw_code
+        self.code = compile(raw_code, "@STEADYMARK@", "exec")
 
 
 def main():
