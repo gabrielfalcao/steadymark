@@ -1,5 +1,5 @@
 # Steady Mark
-> version 0.1.4
+> version 0.2.0
 [![Build Status](https://secure.travis-ci.org/gabrielfalcao/steadymark.png?branch=master)](http://travis-ci.org/#!/gabrielfalcao/steadymark)
 
 ![meme](http://cdn.memegenerator.net/instances/400x/24908847.jpg)
@@ -64,21 +64,9 @@ Just run with:
 $ steadymark README.md
 ```
 
-# Steadymark is on version 0.1.4
+# Steadymark is on version 0.2.0
 
 ```python
 from steadymark import version
-assert version == '0.1.4'
-```
-
-# Steadymark strips headers
-
-```python
-from sure import that
-from steadymark import Runner
-
-tests = Runner(text='## test\n```python\nassert True\n```').run().tests
-assert that(tests).equals([{
-    u'code': u'assert True', u'title': u'test'
-}])
+assert version == '0.2.0'
 ```

@@ -24,14 +24,22 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-version = '0.1.4'
+version = '0.2.0'
+
 import re
 import os
 import sys
 import traceback
 import codecs
+from doctest import (
+    DocTestParser,
+    Example,
+    DocTest,
+    DocTestRunner,
+    TestResults,
+)
 from datetime import datetime
-from collections import OrderedDict
+
 
 from misaka import (
     BaseRenderer,
@@ -41,126 +49,45 @@ from misaka import (
 )
 
 
-class READMETestRunner(BaseRenderer):
-    filename = None
+class MarkdownTest(object):
+    def __init__(self, title, raw_code):
+        self.title = title
+        self.raw_code = raw_code
 
-    def preprocess(self, text):
-        self._tests = [{}]
-        return unicode(text)
-
-    def block_code(self, code, language):
-        if language != 'python':
-            return
-
-        item = self._tests[-1]
-        item[u'code'] = unicode(code).strip()
-        if 'title' not in item:
-            item[u'title'] = u'Test #{0}'.format(len(self._tests))
-            self._tests.append({})
-
-    def header(self, title, level):
-        t = unicode(title)
-        t = re.sub(ur'^[# ]*(.*)', '\g<1>', t)
-        t = re.sub(ur'`([^`]*)`', '\033[1;33m\g<1>\033[0m', t)
-        self._tests.append({
-            u'title': t,
-        })
-
-    def print_red(self, text, indentation=0):
-        for line in text.splitlines():
-            print "{1}\033[1;31m{0}\033[0m".format(line, ' ' * indentation)
-
-    def print_green(self, text, indentation=0):
-        for line in text.splitlines():
-            print "{1}\033[1;32m{0}\033[0m".format(line, ' ' * indentation)
-
-    def format_ms(self, ms):
-        ms = int(ms)
-        if ms < 1000:
-            return ""
-
-        return "\033[1;33m{0}ms\033[0m".format(ms)
-
-    @property
-    def tests(self):
-        return [t for t in self._tests if 'code' in t]
-
-    def postprocess(self, full_document):
-        if not self.filename:
-            return full_document
-
-        actual_tests = self.tests
-        if actual_tests:
-            print "Running code snippets from {0}\n".format(self.filename)
-        else:
-            print "No tests found in {0}".format(self.filename)
-
-        failed = False
-        for test in actual_tests:
-            raw_code = str(test['code'].encode('utf-8'))
-            title = str(test['title'].encode('utf-8'))
-            sys.stdout.write("{0} ".format(title))
-            before = datetime.now()
-            failure = None
-            lines = raw_code.splitlines()
-
-            try:
-                code = compile(raw_code, "@STEADYMARK@", "exec")
-                eval(code)
-            except:
-                failure = sys.exc_info()
-                failed = True
-            after = datetime.now()
-
-            shift = before - after
-            ms = shift.microseconds / 1000
-            if not failure:
-                self.print_green('\xe2\x9c\x93 {0}'.format(self.format_ms(ms)))
-            else:
-                self.print_red('\xe2\x9c\x97 {0}'.format(self.format_ms(ms)))
-                exc, exc_instance, tb = failure
-                tb = tb.tb_next
-                formatted_tb = self.format_traceback(title, exc_instance)
-
-                if tb:
-                    line = lines[tb.tb_lineno - 1]
-                    self.print_red("{0}     {1}".format(formatted_tb, line))
-                elif issubclass(exc, SyntaxError):
-                    self.print_red(formatted_tb, indentation=2)
-
-        sys.exit(int(failed))
-
-    def format_traceback(self, title, exception):
-        formatted_tb = traceback.format_exc(exception)
-        formatted_tb = formatted_tb.replace(
-            'File "@STEADYMARK@',
-            'In the test "@STEADYMARK@',
+        globs = globals()
+        dt_parser = DocTestParser()
+        doctests = filter(
+            lambda item: isinstance(item, Example),
+            dt_parser.parse(raw_code),
         )
-        return formatted_tb.replace(
-            '@STEADYMARK@', title)
-
-
-class Runner(object):
-    def __init__(self, filename=None, text=u''):
-        renderer = READMETestRunner()
-        renderer.filename = filename
-        extensions = EXT_FENCED_CODE | EXT_NO_INTRA_EMPHASIS
-
-        if filename and not os.path.exists(renderer.filename):
-            print 'steadymark could not find {0}'.format(renderer.filename)
-            sys.exit(1)
-
-        if filename:
-            raw_md = codecs.open(renderer.filename, 'rb', 'utf-8').read()
-            text = unicode(raw_md)
-
-        self.text = text
-        self.md = Markdown(renderer, extensions=extensions)
-        self.renderer = renderer
+        if any(doctests):
+            self.code = DocTest(
+                examples=doctests,
+                globs=globs,
+                name=title,
+                filename=None,
+                lineno=None,
+                docstring=None)
+        else:
+            self.code = compile(raw_code, "@STEADYMARK@", "exec")
 
     def run(self):
-        renderer = self.renderer
-        return self.md.render(self.text) and renderer or renderer
+        before = datetime.now()
+        failure = None
+        if isinstance(self.code, DocTest):
+            runner = DocTestRunner()
+            result = runner.run(self.code)
+            after = datetime.now()
+            return result, before, after
+        else:
+            try:
+                eval(self.code)
+            except:
+                failure = sys.exc_info()
+
+        after = datetime.now()
+
+        return failure, before, after
 
 
 class SteadyMark(BaseRenderer):
@@ -204,12 +131,98 @@ class SteadyMark(BaseRenderer):
         md.render(markdown)
         return renderer
 
+    def run(self):
+        for test in self.tests:
+            test.run()
 
-class MarkdownTest(object):
-    def __init__(self, title, raw_code):
-        self.title = title
-        self.raw_code = raw_code
-        self.code = compile(raw_code, "@STEADYMARK@", "exec")
+
+class Runner(object):
+    def __init__(self, filename=None, text=u''):
+        if filename and not os.path.exists(filename):
+            print 'steadymark could not find {0}'.format(filename)
+            sys.exit(1)
+
+        if filename:
+            raw_md = codecs.open(filename, 'rb', 'utf-8').read()
+            text = unicode(raw_md)
+
+        self.steadymark = SteadyMark.inspect(text)
+        self.filename = filename
+        self.text = text
+
+    def print_red(self, text, indentation=0):
+        for line in text.splitlines():
+            print "{1}\033[1;31m{0}\033[0m".format(line, ' ' * indentation)
+
+    def print_green(self, text, indentation=0):
+        for line in text.splitlines():
+            print "{1}\033[1;32m{0}\033[0m".format(line, ' ' * indentation)
+
+    def format_ms(self, ms):
+        ms = int(ms)
+        if ms < 1000:
+            return ""
+
+        return "\033[1;33m{0}ms\033[0m".format(ms)
+
+    def format_traceback(self, title, failure):
+        exc, exc_instance, tb = failure
+
+        formatted_tb = traceback.format_exc(exc_instance).strip()
+        if 'None' == formatted_tb:
+            formatted_tb = ''.join(traceback.format_tb(tb))
+            formatted_tb = formatted_tb.replace(
+                u'File "@STEADYMARK@',
+                u'In the test "@STEADYMARK@',
+            )
+            formatted_tb = formatted_tb.replace(
+                u'@STEADYMARK@', unicode(title))
+
+        return u'{0} {1}\n{2}'.format(
+            exc.__name__,
+            exc_instance,
+            formatted_tb,
+        )
+
+    def report_doctest_result(self, test, result, before, after):
+        # shift = before - after
+        # ms = self.format_ms(shift.microseconds / 1000)
+        # import ipdb;ipdb.set_trace()
+        pass
+
+    def report_raw_test_result(self, test, failure, before, after):
+        shift = before - after
+        ms = self.format_ms(shift.microseconds / 1000)
+        lines = test.raw_code.splitlines()
+
+        if not failure:
+            return self.print_green('\xe2\x9c\x93 {0}'.format(ms))
+
+        self.print_red('\xe2\x9c\x97 {0}'.format(ms))
+        exc, exc_instance, tb = failure
+
+        formatted_tb = self.format_traceback(test.title, failure)
+
+        tb = tb.tb_next
+        if tb:
+            line = lines[tb.tb_lineno - 1]
+            self.print_red("{0}     {1}".format(formatted_tb, line))
+        elif issubclass(exc, SyntaxError):
+            self.print_red(formatted_tb, indentation=2)
+
+    def run(self):
+        if self.filename:
+            print "Running tests from {0}".format(self.filename)
+
+        for test in self.steadymark.tests:
+            sys.stdout.write("{0} ".format(test.title))
+            result, before, after = test.run()
+            if isinstance(result, TestResults):
+                self.report_doctest_result(test, result, before, after)
+            else:
+                self.report_raw_test_result(test, result, before, after)
+
+        return self.steadymark
 
 
 def main():

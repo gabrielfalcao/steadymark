@@ -23,7 +23,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-import sure
+from sure import this
 from steadymark import SteadyMark
 
 
@@ -67,6 +67,56 @@ assert False, 'uh yeah'
     test1.raw_code.should.equal("assert False, 'boom!'")
     eval.when.called_with(test1.code).should.throw(AssertionError, "boom!")
 
+    test2.title.should.equal("test 2")
+    test2.raw_code.should.equal("assert False, 'uh yeah'")
+    eval.when.called_with(test2.code).should.throw(AssertionError, "uh yeah")
+
+
+def test_find_inline_doctests_with_titles():
+    (u"SteadyMark should find docstrings and use the "
+     "previous header as title")
+
+    md = u"""# test 1
+a paragraph
+
+```python
+>>> x = 'doc'
+>>> y = 'test'
+>>> assert (x + y) == 'doctest'
+```
+
+# not a test
+
+foobar
+
+```ruby
+ruby no!
+```
+
+# another part
+
+## test 2
+
+a paragraph
+
+```python
+assert False, 'uh yeah'
+```
+    """
+
+    sm = SteadyMark.inspect(md)
+
+    sm.tests.should.have.length_of(2)
+
+    test1, test2 = sm.tests
+
+    test1.title.should.equal("test 1")
+    test1.raw_code.should.equal(">>> x = 'doc'\n"
+                                ">>> y = 'test'\n"
+                                ">>> assert (x + y) == 'doctest'")
+
+    this(test1.code).should.be.a('doctest.DocTest')
+    test1.run()
     test2.title.should.equal("test 2")
     test2.raw_code.should.equal("assert False, 'uh yeah'")
     eval.when.called_with(test2.code).should.throw(AssertionError, "uh yeah")
