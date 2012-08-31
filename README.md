@@ -67,6 +67,8 @@ $ steadymark README.md
 # Steadymark is on version 0.2.0
 
 ```python
-from steadymark import version
-assert version == '0.2.0'
+>>> from sure import this
+>>> from steadymark import version
+>>> assert this(version).should.equal("0.2.0")
+>>>
 ```

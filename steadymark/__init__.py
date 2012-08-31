@@ -33,9 +33,9 @@ import traceback
 import codecs
 from doctest import (
     DocTestParser,
-    Example,
     DocTest,
     DebugRunner,
+    DocTestFailure,
 )
 from datetime import datetime
 
@@ -50,7 +50,10 @@ from misaka import (
 
 class SteadyMarkDoctestRunner(DebugRunner):
     def report_unexpected_exception(self, out, test, example, exc_info):
-        raise exc_info
+        exc_type, exc_val, tb = exc_info
+        if exc_type is DocTestFailure:
+            raise exc_info
+        raise exc_val
 
 
 class MarkdownTest(object):
@@ -60,10 +63,8 @@ class MarkdownTest(object):
 
         globs = globals()
         dt_parser = DocTestParser()
-        doctests = filter(
-            lambda item: isinstance(item, Example),
-            dt_parser.parse(raw_code),
-        )
+        doctests = dt_parser.get_examples(raw_code)
+
         if any(doctests):
             self.code = DocTest(
                 examples=doctests,
@@ -91,8 +92,9 @@ class MarkdownTest(object):
         failure = None
         result = None
 
+        is_doctest = isinstance(self.code, DocTest)
         try:
-            if isinstance(self.code, DocTest):
+            if is_doctest:
                 result = self._run_doctest()
             else:
                 result = self._run_raw()
@@ -204,9 +206,23 @@ class Runner(object):
 
     def report_failure(self, test, failure, shift, ms):
         self.print_red('\xe2\x9c\x97 {0}'.format(ms))
-        exc, exc_instance, tb = failure
+        exc_type, exc_val, exc_tb = failure
 
-        formatted_tb = self.format_traceback(test, failure)
+        if exc_type is DocTestFailure:
+            formatted_tb = u"the line {0}: {1}\n".format(
+                exc_val.example.lineno,
+                exc_val.example.source,
+            )
+            if exc_val.example.exc_msg:
+                formatted_tb += "{0}\n".format(
+                    exc_val.example.exc_msg)
+            else:
+                formatted_tb += ("resulted in:\n{0}\n"
+                                 "when expecting:\n{1}\n".format(
+                                     exc_val.got, exc_val.example.want))
+
+        else:
+            formatted_tb = self.format_traceback(test, failure)
 
         self.print_red(formatted_tb, indentation=2)
 
