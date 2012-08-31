@@ -1,7 +1,7 @@
-# #!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # <steadymark - markdown-based test runner for python>
-# Copyright (C) <2010>  Gabriel Falcão <gabriel@nacaolivre.org>
+# Copyright (C) <2012>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -23,35 +23,46 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-
-import os
-from setuptools import setup
+from steadymark import SteadyMark
 
 
-def get_packages():
-    # setuptools can't do the job :(
-    packages = []
-    for root, dirnames, filenames in os.walk('steadymark'):
-        if '__init__.py' in filenames:
-            packages.append(".".join(os.path.split(root)).strip("."))
+def test_find_doctest_code_with_titles():
+    (u"SteadyMark should find doctest and use the "
+     "previous header as title")
 
-    return packages
+    md = u"""# test 1
+a paragraph
 
-setup(name='steadymark',
-    version='0.2.0',
-    description=(u'Markdown-based test runner for python. '
-                 'Good for github projects'),
-    author=u'Gabriel Falcao',
-    author_email='gabriel@nacaolivre.org',
-    url='http://github.com/gabrielfalcao/steadymark',
-    packages=get_packages(),
-    install_requires=[
-          'misaka',
-    ],
-    entry_points={
-        'console_scripts': ['steadymark = steadymark:main'],
-        },
-    package_data={
-        'lettuce': ['COPYING', '*.md'],
-    },
-)
+```python
+>>> raise TypeError('boom')
+```
+    """
+
+    sm = SteadyMark.inspect(md)
+    test1 = sm.tests[0]
+    result, (_, failure, tb), before, after = test1.run()
+
+    test1.title.should.equal("test 1")
+    failure.should.be.a(TypeError)
+    "boom".should.be.within(unicode(failure))
+
+
+def test_find_python_code_with_titles():
+    (u"SteadyMark should find python code and use the "
+     "previous header as title")
+
+    md = u"""# test 1
+a paragraph
+
+```python
+raise ValueError('boom')
+```
+    """
+
+    sm = SteadyMark.inspect(md)
+    test1 = sm.tests[0]
+    result, (_, failure, tb), before, after = test1.run()
+
+    test1.title.should.equal("test 1")
+    failure.should.be.a(ValueError)
+    "boom".should.be.within(unicode(failure))

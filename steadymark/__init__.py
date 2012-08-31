@@ -35,8 +35,7 @@ from doctest import (
     DocTestParser,
     Example,
     DocTest,
-    DocTestRunner,
-    TestResults,
+    DebugRunner,
 )
 from datetime import datetime
 
@@ -47,6 +46,11 @@ from misaka import (
     EXT_FENCED_CODE,
     EXT_NO_INTRA_EMPHASIS,
 )
+
+
+class SteadyMarkDoctestRunner(DebugRunner):
+    def report_unexpected_exception(self, out, test, example, exc_info):
+        raise exc_info
 
 
 class MarkdownTest(object):
@@ -71,23 +75,33 @@ class MarkdownTest(object):
         else:
             self.code = compile(raw_code, "@STEADYMARK@", "exec")
 
+    def _run_raw(self):
+        return eval(self.code)
+
+    def _run_doctest(self):
+        if not isinstance(self.code, DocTest):
+            raise TypeError(
+                "Attempt to run a non-doctest as doctest: %r" % self.code)
+
+        runner = SteadyMarkDoctestRunner(verbose=False)
+        return runner.run(self.code)
+
     def run(self):
         before = datetime.now()
         failure = None
-        if isinstance(self.code, DocTest):
-            runner = DocTestRunner()
-            result = runner.run(self.code)
-            after = datetime.now()
-            return result, before, after
-        else:
-            try:
-                eval(self.code)
-            except:
-                failure = sys.exc_info()
+        result = None
+
+        try:
+            if isinstance(self.code, DocTest):
+                result = self._run_doctest()
+            else:
+                result = self._run_raw()
+        except:
+            failure = sys.exc_info()
 
         after = datetime.now()
 
-        return failure, before, after
+        return result, failure, before, after
 
 
 class SteadyMark(BaseRenderer):
@@ -131,10 +145,6 @@ class SteadyMark(BaseRenderer):
         md.render(markdown)
         return renderer
 
-    def run(self):
-        for test in self.tests:
-            test.run()
-
 
 class Runner(object):
     def __init__(self, filename=None, text=u''):
@@ -150,6 +160,10 @@ class Runner(object):
         self.filename = filename
         self.text = text
 
+    def print_white(self, text, indentation=0):
+        for line in text.splitlines():
+            print "{1}\033[1;37m{0}\033[0m".format(line, ' ' * indentation)
+
     def print_red(self, text, indentation=0):
         for line in text.splitlines():
             print "{1}\033[1;31m{0}\033[0m".format(line, ' ' * indentation)
@@ -158,69 +172,73 @@ class Runner(object):
         for line in text.splitlines():
             print "{1}\033[1;32m{0}\033[0m".format(line, ' ' * indentation)
 
+    def print_yellow(self, text, indentation=0):
+        for line in text.splitlines():
+            print "{1}\033[1;33m{0}\033[0m".format(line, ' ' * indentation)
+
     def format_ms(self, ms):
         ms = int(ms)
-        if ms < 1000:
-            return ""
-
         return "\033[1;33m{0}ms\033[0m".format(ms)
 
-    def format_traceback(self, title, failure):
+    def format_traceback(self, test, failure):
         exc, exc_instance, tb = failure
+        # formatted_tb = traceback.format_exc(exc_instance).strip()
+        # if 'None' == formatted_tb:
+        formatted_tb = ''.join(traceback.format_tb(tb))
+        formatted_tb = formatted_tb.replace(
+            u'File "@STEADYMARK@',
+            u'In the test "@STEADYMARK@',
+        )
+        formatted_tb = formatted_tb.replace(
+            u'@STEADYMARK@', unicode(test.title))
 
-        formatted_tb = traceback.format_exc(exc_instance).strip()
-        if 'None' == formatted_tb:
-            formatted_tb = ''.join(traceback.format_tb(tb))
-            formatted_tb = formatted_tb.replace(
-                u'File "@STEADYMARK@',
-                u'In the test "@STEADYMARK@',
-            )
-            formatted_tb = formatted_tb.replace(
-                u'@STEADYMARK@', unicode(title))
-
-        return u'{0} {1}\n{2}'.format(
+        return u'{0} \033[1;36m{1}\n{2}\n'.format(
             exc.__name__,
             exc_instance,
             formatted_tb,
         )
 
-    def report_doctest_result(self, test, result, before, after):
-        # shift = before - after
-        # ms = self.format_ms(shift.microseconds / 1000)
-        # import ipdb;ipdb.set_trace()
-        pass
+    def report_success(self, test, shift, ms):
+        self.print_green('\xe2\x9c\x93 {0}'.format(ms))
+        print
 
-    def report_raw_test_result(self, test, failure, before, after):
-        shift = before - after
-        ms = self.format_ms(shift.microseconds / 1000)
-        lines = test.raw_code.splitlines()
-
-        if not failure:
-            return self.print_green('\xe2\x9c\x93 {0}'.format(ms))
-
+    def report_failure(self, test, failure, shift, ms):
         self.print_red('\xe2\x9c\x97 {0}'.format(ms))
         exc, exc_instance, tb = failure
 
-        formatted_tb = self.format_traceback(test.title, failure)
+        formatted_tb = self.format_traceback(test, failure)
 
-        tb = tb.tb_next
-        if tb:
-            line = lines[tb.tb_lineno - 1]
-            self.print_red("{0}     {1}".format(formatted_tb, line))
-        elif issubclass(exc, SyntaxError):
-            self.print_red(formatted_tb, indentation=2)
+        self.print_red(formatted_tb, indentation=2)
+
+        header = "original code:"
+        header_length = len(header)
+        self.print_white("*" * header_length)
+        self.print_white(header)
+        self.print_white("*" * header_length)
+
+        self.print_yellow(test.raw_code, indentation=2)
+        print
+
+    def report_test_result(self, test, failure, before, after):
+        shift = before - after
+        ms = self.format_ms(shift.microseconds / 1000)
+
+        if not failure:
+            return self.report_success(test, shift, ms)
+
+        return self.report_failure(test, failure, shift, ms)
 
     def run(self):
         if self.filename:
             print "Running tests from {0}".format(self.filename)
 
         for test in self.steadymark.tests:
-            sys.stdout.write("{0} ".format(test.title))
-            result, before, after = test.run()
-            if isinstance(result, TestResults):
-                self.report_doctest_result(test, result, before, after)
-            else:
-                self.report_raw_test_result(test, result, before, after)
+            title = "{0} ".format(test.title)
+            title_length = len(title)
+            print "." * title_length
+            sys.stdout.write(title)
+            result, failure, before, after = test.run()
+            self.report_test_result(test, failure, before, after)
 
         return self.steadymark
 
