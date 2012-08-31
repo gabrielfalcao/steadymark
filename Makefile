@@ -4,7 +4,7 @@ filename=steadymark-`python -c 'import steadymark;print steadymark.version'`.tar
 
 export PYTHONPATH:=  ${PWD}
 
-test: clean unit functional
+test: clean unit functional integration
 
 unit:
 	@echo "Running unit tests"
@@ -12,6 +12,9 @@ unit:
 
 functional:
 	@python steadymark/__init__.py
+
+integration:
+	@nosetests --verbosity=2 -s tests/integration
 
 clean:
 	@printf "Cleaning up files that are already in .gitignore... "

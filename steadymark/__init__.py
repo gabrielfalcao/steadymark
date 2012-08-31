@@ -248,13 +248,19 @@ class Runner(object):
         if self.filename:
             print "Running tests from {0}".format(self.filename)
 
+        exit_status = 0
         for test in self.steadymark.tests:
             title = "{0} ".format(test.title)
             title_length = len(title)
             print "." * title_length
             sys.stdout.write(title)
             result, failure, before, after = test.run()
+            if failure:
+                exit_status = 1
             self.report_test_result(test, failure, before, after)
+
+        if exit_status is not 0:
+            sys.exit(exit_status)
 
         return self.steadymark
 
