@@ -38,7 +38,10 @@ from doctest import (
     DocTestFailure,
 )
 from datetime import datetime
-
+try:
+    from couleur import SUPPORTS_ANSI
+except ImportError:
+    SUPPORTS_ANSI = False
 
 from misaka import (
     BaseRenderer,
@@ -99,6 +102,7 @@ class MarkdownTest(object):
                 result = self._run_doctest()
             else:
                 result = self._run_raw()
+
         except:
             failure = sys.exc_info()
 
@@ -189,24 +193,50 @@ class Runner(object):
         self.text = text
 
     def print_white(self, text, indentation=0):
+        white = {
+            True: u'\033[1;37m',
+            False: u'',
+        }
         for line in text.splitlines():
-            print "{1}\033[1;37m{0}\033[0m".format(line, ' ' * indentation)
+            print "{1}{2}{0}\033[0m".format(
+                line, ' ' * indentation, white[SUPPORTS_ANSI])
 
-    def print_red(self, text, indentation=0):
-        for line in text.splitlines():
-            print "{1}\033[1;31m{0}\033[0m".format(line, ' ' * indentation)
+    def __getattr__(self, attr):
+        if attr not in (
+            'print_white',
+            'print_green',
+            'print_red',
+            'print_yellow',
+        ):
+            return super(Runner, self).__getattribute__(attr)
 
-    def print_green(self, text, indentation=0):
-        for line in text.splitlines():
-            print "{1}\033[1;32m{0}\033[0m".format(line, ' ' * indentation)
+        color_for = {
+            'print_white': u'\033[1;37m',
+            'print_red': u'\033[1;31m',
+            'print_green': u'\033[1;32m',
+            'print_yellow': u'\033[1;33m',
+        }
+        ansi = color_for[attr]
+        if SUPPORTS_ANSI:
+            color = ansi
+            no_color = '\033[0m'
+        else:
+            no_color = color = ''
 
-    def print_yellow(self, text, indentation=0):
-        for line in text.splitlines():
-            print "{1}\033[1;33m{0}\033[0m".format(line, ' ' * indentation)
+        def printer(text, indentation=0):
+            for line in text.splitlines():
+                print "{1}{2}{0}{3}".format(
+                    line, ' ' * indentation, color, no_color)
+
+        return printer
 
     def format_ms(self, ms):
         ms = int(ms)
-        return "\033[1;33m{0}ms\033[0m".format(ms)
+        base = '{0}ms'.format(ms)
+        if SUPPORTS_ANSI:
+            return "\033[1;33m{0}\033[0m".format(base)
+        else:
+            return base
 
     def format_traceback(self, test, failure):
         exc, exc_instance, tb = failure
@@ -220,10 +250,15 @@ class Runner(object):
         formatted_tb = formatted_tb.replace(
             u'@STEADYMARK@', unicode(test.title))
 
-        return u'{0} \033[1;36m{1}\n{2}\n'.format(
+        if SUPPORTS_ANSI:
+            color = '\033[1;36m'
+        else:
+            color = ''
+        return u'{0} {3}{1}\n{2}\n'.format(
             exc.__name__,
             exc_instance,
             formatted_tb,
+            color,
         )
 
     def report_success(self, test, shift, ms):

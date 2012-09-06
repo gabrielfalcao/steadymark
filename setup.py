@@ -48,6 +48,7 @@ setup(name='steadymark',
     packages=get_packages(),
     install_requires=[
           'misaka',
+          'couleur>=0.4.1',
     ],
     entry_points={
         'console_scripts': ['steadymark = steadymark:main'],
