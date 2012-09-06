@@ -122,6 +122,9 @@ class SteadyMark(BaseRenderer):
         if language != 'python':
             return
 
+        if re.match('^#\s*steadymark:\s*ignore', code):
+            return
+
         item = self._tests[-1]
         if 'code' in item:  # the same title has more than 1 code
             found = self.title_regex.search(item['title'])

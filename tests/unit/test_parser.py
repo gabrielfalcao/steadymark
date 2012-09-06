@@ -148,3 +148,23 @@ assert False, 'SECOND'
 
     test2.title.should.equal("Test Foo #2")
     eval.when.called_with(test2.code).should.throw(AssertionError, "SECOND")
+
+
+def test_skip_tests_marked_with_ignore():
+    (u"SteadyMark should skip tests with the 'ignore' modeline")
+
+    md = u"""# My test
+```python
+# steadymark: ignore
+This should break, but it won't because steady mark will ignore this
+```
+
+# Another test
+```python
+>>> 1 + 1
+2
+```
+"""
+    sm = SteadyMark.inspect(md)
+    sm.tests.should.have.length_of(1)
+    sm.tests[0].title.should.be.equal('Another test')
