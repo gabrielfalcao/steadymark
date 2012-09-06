@@ -24,7 +24,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-version = '0.2.0'
+version = '0.3.0'
 
 import re
 import os
@@ -108,6 +108,8 @@ class MarkdownTest(object):
 
 
 class SteadyMark(BaseRenderer):
+    title_regex = re.compile(ur'(?P<title>.*)(?:[#]+(?P<index>\d+))?')
+
     def preprocess(self, text):
         self._tests = [{}]
         return unicode(text)
@@ -117,7 +119,27 @@ class SteadyMark(BaseRenderer):
             return
 
         item = self._tests[-1]
-        item[u'code'] = unicode(code).strip()
+        if 'code' in item:  # the same title has more than 1 code
+            found = self.title_regex.search(item['title'])
+            title = found.group('title')
+            index = int(found.group('index') or 0)
+
+            if not index:
+                index = 1
+                item['title'] = '{0} #{1}'.format(title, index)
+
+            new_item = {
+                'title': '{0} #{1}'.format(title, index + 1),
+                'level': item['level'],
+                'code': code,
+            }
+
+            self._tests.append(new_item)
+            item = self._tests[-1]
+
+        else:
+            item[u'code'] = unicode(code).strip()
+
         if 'title' not in item:
             item[u'title'] = u'Test #{0}'.format(len(self._tests))
             self._tests.append({})
@@ -128,6 +150,7 @@ class SteadyMark(BaseRenderer):
         t = re.sub(ur'`([^`]*)`', '\033[1;33m\g<1>\033[0m', t)
         self._tests.append({
             u'title': t,
+            u'level': int(level),
         })
 
     def postprocess(self, full_document):

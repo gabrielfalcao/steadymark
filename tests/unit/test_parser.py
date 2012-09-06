@@ -120,3 +120,31 @@ assert False, 'uh yeah'
     test2.title.should.equal("test 2")
     test2.raw_code.should.equal("assert False, 'uh yeah'")
     eval.when.called_with(test2.code).should.throw(AssertionError, "uh yeah")
+
+
+def test_use_same_title_for_all_tests():
+    (u"SteadyMark should find all the tests under the same header (title)")
+
+    md = u"""# Test Foo
+a paragraph
+
+```python
+assert False, 'FIRST'
+```
+
+```python
+assert False, 'SECOND'
+```
+    """
+
+    sm = SteadyMark.inspect(md)
+
+    sm.tests.should.have.length_of(2)
+
+    test1, test2 = sm.tests
+
+    test1.title.should.equal("Test Foo #1")
+    eval.when.called_with(test1.code).should.throw(AssertionError, "FIRST")
+
+    test2.title.should.equal("Test Foo #2")
+    eval.when.called_with(test2.code).should.throw(AssertionError, "SECOND")

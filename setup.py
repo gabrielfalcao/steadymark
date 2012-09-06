@@ -38,7 +38,7 @@ def get_packages():
     return packages
 
 setup(name='steadymark',
-    version='0.2.0',
+    version='0.2.1',
     description=(u'Markdown-based test runner for python. '
                  'Good for github projects'),
     author=u'Gabriel Falcao',
