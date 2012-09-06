@@ -66,3 +66,33 @@ raise ValueError('boom')
     test1.title.should.equal("test 1")
     failure.should.be.a(ValueError)
     "boom".should.be.within(unicode(failure))
+
+
+def test_keeps_scope_from_test_to_test():
+    (u"SteadyMark should accumulate the scope throughout the python code snippets")
+
+    md = u"""# test 1
+a paragraph
+
+```python
+value = "YAY"
+```
+
+# test 2
+a paragraph
+
+```python
+assert value == 'YAY'
+```
+"""
+
+    sm = SteadyMark.inspect(md)
+    test1, test2 = sm.tests
+    result1, failure1, before, after = test1.run()
+    result2, failure2, before, after = test2.run()
+
+    test1.title.should.equal("test 1")
+    test2.title.should.equal("test 2")
+
+    failure1.should.be.none
+    failure2.should.be.none

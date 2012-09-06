@@ -70,5 +70,4 @@ $ steadymark README.md
 >>> from sure import this
 >>> from steadymark import version
 >>> assert this(version).should.equal("0.2.0")
->>>
 ```

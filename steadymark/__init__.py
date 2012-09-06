@@ -57,27 +57,28 @@ class SteadyMarkDoctestRunner(DebugRunner):
 
 
 class MarkdownTest(object):
-    def __init__(self, title, raw_code):
+    def __init__(self, title, raw_code, globs, locs):
         self.title = title
         self.raw_code = raw_code
 
-        globs = globals()
+        self.globs = globs
+        self.locs = locs
         dt_parser = DocTestParser()
         doctests = dt_parser.get_examples(raw_code)
 
         if any(doctests):
             self.code = DocTest(
                 examples=doctests,
-                globs=globs,
+                globs=self.globs,
                 name=title,
                 filename=None,
                 lineno=None,
                 docstring=None)
         else:
-            self.code = compile(raw_code, "@STEADYMARK@", "exec")
+            self.code = compile(raw_code, title, "exec")
 
     def _run_raw(self):
-        return eval(self.code)
+        return eval(self.code, self.globs, self.locs)
 
     def _run_doctest(self):
         if not isinstance(self.code, DocTest):
@@ -132,10 +133,12 @@ class SteadyMark(BaseRenderer):
     def postprocess(self, full_document):
         tests = []
 
+        globs = globals()
+        locs = locals()
         for test in filter(lambda x: 'code' in x, self._tests):
             raw_code = str(test['code'].encode('utf-8'))
             title = str(test['title'].encode('utf-8'))
-            tests.append(MarkdownTest(title, raw_code))
+            tests.append(MarkdownTest(title, raw_code, globs=globs, locs=locs))
 
         self.tests = tests
 
@@ -188,8 +191,8 @@ class Runner(object):
         # if 'None' == formatted_tb:
         formatted_tb = ''.join(traceback.format_tb(tb))
         formatted_tb = formatted_tb.replace(
-            u'File "@STEADYMARK@',
-            u'In the test "@STEADYMARK@',
+            u'File "{0}"'.format(test.title),
+            u'In the test "{0}"'.format(test.title),
         )
         formatted_tb = formatted_tb.replace(
             u'@STEADYMARK@', unicode(test.title))
