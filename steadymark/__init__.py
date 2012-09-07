@@ -112,7 +112,7 @@ class MarkdownTest(object):
 
 
 class SteadyMark(BaseRenderer):
-    title_regex = re.compile(ur'(?P<title>.*)(?:[#]+(?P<index>\d+))?')
+    title_regex = re.compile(ur'(?P<title>[^#]+)(?:[#]+(?P<index>\d+))?')
 
     def preprocess(self, text):
         self._tests = [{}]
@@ -128,7 +128,7 @@ class SteadyMark(BaseRenderer):
         item = self._tests[-1]
         if 'code' in item:  # the same title has more than 1 code
             found = self.title_regex.search(item['title'])
-            title = found.group('title')
+            title = found.group('title').rstrip()
             index = int(found.group('index') or 0)
 
             if not index:

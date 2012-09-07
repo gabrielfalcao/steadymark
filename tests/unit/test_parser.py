@@ -135,19 +135,27 @@ assert False, 'FIRST'
 ```python
 assert False, 'SECOND'
 ```
+
+```python
+assert False, 'THIRD'
+```
+
     """
 
     sm = SteadyMark.inspect(md)
 
-    sm.tests.should.have.length_of(2)
+    sm.tests.should.have.length_of(3)
 
-    test1, test2 = sm.tests
+    test1, test2, test3 = sm.tests
 
     test1.title.should.equal("Test Foo #1")
     eval.when.called_with(test1.code).should.throw(AssertionError, "FIRST")
 
     test2.title.should.equal("Test Foo #2")
     eval.when.called_with(test2.code).should.throw(AssertionError, "SECOND")
+
+    test3.title.should.equal("Test Foo #3")
+    eval.when.called_with(test3.code).should.throw(AssertionError, "THIRD")
 
 
 def test_skip_tests_marked_with_ignore():
