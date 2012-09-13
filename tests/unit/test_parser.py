@@ -24,7 +24,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 from sure import this
-from steadymark import SteadyMark
+from steadymark.core import SteadyMark
 
 
 def test_find_python_code_with_titles():

@@ -26,7 +26,7 @@
 
 import os
 from setuptools import setup
-from steadymark import version
+from steadymark.version import version
 
 
 def get_packages():

@@ -24,29 +24,4 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-from optparse import OptionParser
-from steadymark.version import version
-try:
-    from steadymark.runner import Runner
-except ImportError, e:
-    if 'misaka' in unicode(e):
-        Runner = None
-    else:
-        raise
-
-
-def run(filenames):
-    for filename in filenames:
-        runner = Runner(filename)
-        runner.run()
-
-__all__ = [
-    'run',
-    'Runner',
-    'version',
-]
-
-if __name__ == '__main__':
-    parser = OptionParser()
-    (options, args) = parser.parse_args()
-    run(args or ['README.md'])
+version = '0.4.2'
