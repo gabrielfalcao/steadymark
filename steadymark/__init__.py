@@ -40,6 +40,12 @@ def run(filenames):
         runner = Runner(filename)
         runner.run()
 
+
+def main():
+    parser = OptionParser()
+    (options, args) = parser.parse_args()
+    run(args or ['README.md'])
+
 __all__ = [
     'run',
     'Runner',
@@ -47,6 +53,4 @@ __all__ = [
 ]
 
 if __name__ == '__main__':
-    parser = OptionParser()
-    (options, args) = parser.parse_args()
-    run(args or ['README.md'])
+    main()
