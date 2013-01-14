@@ -26,6 +26,7 @@
 
 import os
 from setuptools import setup
+from steadymark.six import PY3
 from steadymark.version import version
 
 
@@ -38,6 +39,14 @@ def get_packages():
 
     return packages
 
+requirements = [
+          'misaka==1.0.2',
+]
+if not PY3:
+    # Couleur is not py3 compatible.
+    requirements.append('couleur>=0.4.1')
+
+
 setup(name='steadymark',
     version=version,
     description=(u'Markdown-based test runner for python. '
@@ -46,10 +55,7 @@ setup(name='steadymark',
     author_email='gabriel@nacaolivre.org',
     url='http://github.com/gabrielfalcao/steadymark',
     packages=get_packages(),
-    install_requires=[
-          'misaka',
-          'couleur>=0.4.1',
-    ],
+    install_requires=requirements,
     entry_points={
         'console_scripts': ['steadymark = steadymark:main'],
         },

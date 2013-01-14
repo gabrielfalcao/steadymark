@@ -1,6 +1,7 @@
 dist/
 steadymark-0.1.4.tar.gz
 *egg-info
+*.tox
 *.pyc
 build
 steadymark-*.*.*.tar.gz

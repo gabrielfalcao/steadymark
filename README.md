@@ -27,8 +27,8 @@ it will be used as title for your test.
 ## unicode.lower transforms string into lowercase
 
 ```python
-from sure import that
-assert that(u"Gabriel Falcao".lower()).equals(u"gabriel falcao")
+from sure import expect
+assert expect(u"Gabriel Falcao".lower()).equals(u"gabriel falcao")
 ```
 
 ## python can add numbers
@@ -67,7 +67,7 @@ $ steadymark README.md
 # Steadymark is on version 0.4.3
 
 ```python
->>> from sure import this
+>>> from sure import expect
 >>> from steadymark import version
->>> assert this(version).should.equal("0.4.3")
+>>> assert expect(version).should.equal("0.4.3")
 ```

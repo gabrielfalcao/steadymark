@@ -23,6 +23,8 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
+from __future__ import unicode_literals
+
 import re
 import sys
 
@@ -39,6 +41,7 @@ from misaka import (
     EXT_FENCED_CODE,
     EXT_NO_INTRA_EMPHASIS,
 )
+from steadymark.six import text_type
 
 
 class SteadyMarkDoctestRunner(DebugRunner):
@@ -102,11 +105,11 @@ class MarkdownTest(object):
 
 
 class SteadyMark(BaseRenderer):
-    title_regex = re.compile(ur'(?P<title>[^#]+)(?:[#]+(?P<index>\d+))?')
+    title_regex = re.compile(r'(?P<title>[^#]+)(?:[#]+(?P<index>\d+))?')
 
     def preprocess(self, text):
         self._tests = [{}]
-        return unicode(text)
+        return text_type(text)
 
     def block_code(self, code, language):
         if language != 'python':
@@ -135,16 +138,16 @@ class SteadyMark(BaseRenderer):
             item = self._tests[-1]
 
         else:
-            item[u'code'] = unicode(code).strip()
+            item[u'code'] = text_type(code).strip()
 
         if 'title' not in item:
             item[u'title'] = u'Test #{0}'.format(len(self._tests))
             self._tests.append({})
 
     def header(self, title, level):
-        t = unicode(title)
-        t = re.sub(ur'^[# ]*(.*)', '\g<1>', t)
-        t = re.sub(ur'`([^`]*)`', '\033[1;33m\g<1>\033[0m', t)
+        t = text_type(title)
+        t = re.sub(r'^[# ]*(.*)', '\g<1>', t)
+        t = re.sub(r'`([^`]*)`', '\033[1;33m\g<1>\033[0m', t)
         self._tests.append({
             u'title': t,
             u'level': int(level),
@@ -156,8 +159,8 @@ class SteadyMark(BaseRenderer):
         globs = globals()
         locs = locals()
         for test in filter(lambda x: 'code' in x, self._tests):
-            raw_code = str(test['code'].encode('utf-8'))
-            title = str(test['title'].encode('utf-8'))
+            raw_code = test['code']
+            title = test['title']
             tests.append(MarkdownTest(title, raw_code, globs=globs, locs=locs))
 
         self.tests = tests

@@ -23,13 +23,15 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
+from __future__ import unicode_literals
 
 from optparse import OptionParser
+from steadymark.six import text_type
 from steadymark.version import version
 try:
     from steadymark.runner import Runner
-except ImportError, e:
-    if 'misaka' in unicode(e):
+except ImportError as e:
+    if 'misaka' in text_type(e):
         Runner = None
     else:
         raise

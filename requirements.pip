@@ -6,5 +6,7 @@ ipdb==0.7
 ipython==0.13
 misaka==1.0.2
 nose==1.1.2
-sure==1.0.5
+#sure==1.0.5
+-e git+git://github.com/spulec/sure.git@py3k#egg=sure
+tox==1.4.2
 wsgiref==0.1.2
