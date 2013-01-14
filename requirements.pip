@@ -1,6 +1,6 @@
 Pygments==1.5
 bpython==0.11
-distribute==0.6.27
+distribute>=0.6.24
 ipdb==0.7
 ipython==0.13
 misaka==1.0.2
