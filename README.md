@@ -64,10 +64,10 @@ Just run with:
 $ steadymark README.md
 ```
 
-# Steadymark is on version 0.4.3
+# Steadymark is on version 0.4.4
 
 ```python
 >>> from sure import expect
 >>> from steadymark import version
->>> assert expect(version).should.equal("0.4.3")
+>>> assert expect(version).should.equal("0.4.4")
 ```
