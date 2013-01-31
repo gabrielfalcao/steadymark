@@ -23,6 +23,8 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
+from __future__ import unicode_literals
+
 import os
 import sys
 import traceback
@@ -37,17 +39,22 @@ from steadymark.core import (
     SteadyMark,
     DocTestFailure,
 )
+from steadymark.six import text_type, PY3
+
+if not PY3:
+    # We do this so that redirecting to pipes will work
+    sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 
 class Runner(object):
     def __init__(self, filename=None, text=u''):
         if filename and not os.path.exists(filename):
-            print 'steadymark could not find {0}'.format(filename)
+            print('steadymark could not find {0}'.format(filename))
             sys.exit(1)
 
         if filename:
             raw_md = codecs.open(filename, 'rb', 'utf-8').read()
-            text = unicode(raw_md)
+            text = text_type(raw_md)
 
         self.steadymark = SteadyMark.inspect(text)
         self.filename = filename
@@ -59,8 +66,8 @@ class Runner(object):
             False: u'',
         }
         for line in text.splitlines():
-            print "{1}{2}{0}\033[0m".format(
-                line, ' ' * indentation, white[SUPPORTS_ANSI])
+            print("{1}{2}{0}\033[0m".format(
+                line, ' ' * indentation, white[SUPPORTS_ANSI]))
 
     def __getattr__(self, attr):
         if attr not in (
@@ -86,8 +93,8 @@ class Runner(object):
 
         def printer(text, indentation=0):
             for line in text.splitlines():
-                print "{1}{2}{0}{3}".format(
-                    line, ' ' * indentation, color, no_color)
+                print("{1}{2}{0}{3}".format(
+                    line, ' ' * indentation, color, no_color))
 
         return printer
 
@@ -109,7 +116,7 @@ class Runner(object):
             u'In the test "{0}"'.format(test.title),
         )
         formatted_tb = formatted_tb.replace(
-            u'@STEADYMARK@', unicode(test.title))
+            u'@STEADYMARK@', text_type(test.title))
 
         if SUPPORTS_ANSI:
             color = '\033[1;36m'
@@ -168,13 +175,13 @@ class Runner(object):
 
     def run(self):
         if self.filename:
-            print "Running tests from {0}".format(self.filename)
+            print("Running tests from {0}".format(self.filename))
 
         exit_status = 0
         for test in self.steadymark.tests:
             title = "{0} ".format(test.title)
             title_length = len(title)
-            print "." * title_length
+            print("." * title_length)
             sys.stdout.write(title)
             result, failure, before, after = test.run()
             if failure:

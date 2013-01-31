@@ -23,7 +23,10 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
+from __future__ import unicode_literals
+
 from steadymark.core import SteadyMark
+from steadymark.six import text_type
 
 
 def test_find_doctest_code_with_titles():
@@ -44,7 +47,7 @@ a paragraph
 
     test1.title.should.equal("test 1")
     failure.should.be.a(TypeError)
-    "boom".should.be.within(unicode(failure))
+    "boom".should.be.within(text_type(failure))
 
 
 def test_find_python_code_with_titles():
@@ -65,7 +68,7 @@ raise ValueError('boom')
 
     test1.title.should.equal("test 1")
     failure.should.be.a(ValueError)
-    "boom".should.be.within(unicode(failure))
+    "boom".should.be.within(text_type(failure))
 
 
 def test_keeps_scope_from_test_to_test():
