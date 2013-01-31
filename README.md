@@ -1,5 +1,5 @@
 # Steady Mark
-> version 0.4.3
+> version 0.4.4
 [![Build Status](https://secure.travis-ci.org/gabrielfalcao/steadymark.png?branch=master)](http://travis-ci.org/#!/gabrielfalcao/steadymark)
 
 ![meme](http://cdn.memegenerator.net/instances/400x/24908847.jpg)
