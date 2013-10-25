@@ -27,7 +27,6 @@
 import os
 from setuptools import setup
 from steadymark.six import PY3
-from steadymark.version import version
 
 
 def get_packages():
@@ -40,7 +39,7 @@ def get_packages():
     return packages
 
 requirements = [
-          'misaka==1.0.2',
+          'misaka',
 ]
 if not PY3:
     # Couleur is not py3 compatible.
@@ -48,7 +47,7 @@ if not PY3:
 
 
 setup(name='steadymark',
-    version=version,
+    version='0.5.2',
     description=(u'Markdown-based test runner for python. '
                  'Good for github projects'),
     author=u'Gabriel Falcao',
@@ -60,6 +59,6 @@ setup(name='steadymark',
         'console_scripts': ['steadymark = steadymark:main'],
         },
     package_data={
-        'lettuce': ['COPYING', '*.md'],
+        'steadymark': ['COPYING', '*.md'],
     },
 )
