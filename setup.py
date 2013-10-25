@@ -26,7 +26,6 @@
 
 import os
 from setuptools import setup
-from steadymark.six import PY3
 
 
 def get_packages():
@@ -41,10 +40,6 @@ def get_packages():
 requirements = [
           'misaka',
 ]
-if not PY3:
-    # Couleur is not py3 compatible.
-    requirements.append('couleur>=0.4.1')
-
 
 setup(name='steadymark',
     version='0.5.2',
