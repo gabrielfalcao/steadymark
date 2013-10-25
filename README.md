@@ -1,7 +1,7 @@
 # Steady Mark
 > version 0.5.2
 [![Build Status](https://secure.travis-ci.org/gabrielfalcao/steadymark.png?branch=master)](http://travis-ci.org/#!/gabrielfalcao/steadymark)
-
+[![instanc.es Badge](https://instanc.es/bin/gabrielfalcao/steadymark.png)](http://instanc.es)
 ![meme](http://cdn.memegenerator.net/instances/400x/24908847.jpg)
 
 # Turning your github readme files into python test suites since 2012
