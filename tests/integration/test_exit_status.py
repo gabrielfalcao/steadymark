@@ -23,7 +23,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-
+import os
 import sys
 from os.path import dirname, abspath, join
 from subprocess import check_call, CalledProcessError
@@ -35,10 +35,10 @@ MAINDIR = abspath(join(CURDIR, '..', '..'))
 main_file = join(MAINDIR, 'steadymark', '__init__.py')
 
 
-def run(path):
-    out = open('/dev/null')
-    return check_call([sys.executable, main_file, path],
-                        stdout=out, stderr=out)
+def run(path, *args):
+    params = [sys.executable, main_file] + list(args) + [path]
+    out = open(os.devnull, 'w')
+    return check_call(params, stdout=out, stderr=out)
 
 
 def test_failure_exits_with_1():
@@ -54,3 +54,11 @@ def test_success_exits_with_0():
 
     status = run(join(CURDIR, 'passes.md'))
     status.should.equal(0)
+
+
+def test_import_boot_file():
+    (u"SteadyMark should be able to import a python file before running the tests")
+
+    path = join(CURDIR, 'passes.md')
+    run.when.called_with(path, "-b", join(CURDIR, 'firstboot.py')).should.throw(
+                CalledProcessError, 'exit status 42')

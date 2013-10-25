@@ -24,7 +24,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 from __future__ import unicode_literals
-
+import imp
 from optparse import OptionParser
 from steadymark.six import text_type
 from steadymark.version import version
@@ -32,7 +32,10 @@ try:
     from steadymark.runner import Runner
 except ImportError as e:
     if 'misaka' in text_type(e):
-        Runner = None
+        import ipdb;ipdb.set_trace()
+
+        print "Please install misaka in order to use steadymark"
+        raise SystemExit(1)
     else:
         raise
 
@@ -45,7 +48,14 @@ def run(filenames):
 
 def main():
     parser = OptionParser()
+    parser.add_option("-b", "--bootstrap", dest="bootstrap_file",
+                  help="A path to a python file to be loaded before steadymark runs the tests")
+
     (options, args) = parser.parse_args()
+
+    if options.bootstrap_file:
+        imp.load_source('steadymark_bootstrap', options.bootstrap_file)
+
     run(args or ['README.md'])
 
 __all__ = [

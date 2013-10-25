@@ -1,5 +1,5 @@
 # Steady Mark
-> version 0.4.5
+> version 0.5.0
 [![Build Status](https://secure.travis-ci.org/gabrielfalcao/steadymark.png?branch=master)](http://travis-ci.org/#!/gabrielfalcao/steadymark)
 
 ![meme](http://cdn.memegenerator.net/instances/400x/24908847.jpg)
@@ -64,10 +64,15 @@ Just run with:
 $ steadymark README.md
 ```
 
-# Steadymark is on version 0.4.5
+## loading a python file before running tests
+
+you can tell steadymark to load a "boot" file before running the tests, it's very useful for hooking up [sure](http://falcao.it/sure) or [HTTPretty](http://falcao.it/HTTPretty)
+
+
+# Steadymark is on version 0.5.0
 
 ```python
 >>> from sure import expect
 >>> from steadymark import version
->>> assert expect(version).should.equal("0.4.5")
+>>> assert expect(version).should.equal("0.5.0")
 ```
