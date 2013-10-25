@@ -25,4 +25,4 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 from __future__ import unicode_literals
 
-version = '0.5.2'
+version = '0.5.3'
