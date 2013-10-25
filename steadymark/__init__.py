@@ -28,16 +28,7 @@ import imp
 from optparse import OptionParser
 from steadymark.six import text_type
 from steadymark.version import version
-try:
-    from steadymark.runner import Runner
-except ImportError as e:
-    if 'misaka' in text_type(e):
-        import ipdb;ipdb.set_trace()
-
-        print "Please install misaka in order to use steadymark"
-        raise SystemExit(1)
-    else:
-        raise
+from steadymark.runner import Runner
 
 
 def run(filenames):
