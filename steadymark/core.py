@@ -74,7 +74,7 @@ class MarkdownTest(object):
             self.code = compile(raw_code, title, "exec")
 
     def _run_raw(self):
-        return eval(self.code, self.globs, self.locs)
+        return eval(self.code, self.globs)
 
     def _run_doctest(self):
         if not isinstance(self.code, DocTest):
@@ -109,6 +109,8 @@ class SteadyMark(BaseRenderer):
 
     def preprocess(self, text):
         self._tests = [{}]
+        self.globs = globals()
+        self.locs = locals()
         return text_type(text)
 
     def block_code(self, code, language):
@@ -156,8 +158,8 @@ class SteadyMark(BaseRenderer):
     def postprocess(self, full_document):
         tests = []
 
-        globs = globals()
-        locs = locals()
+        globs = self.globs
+        locs = self.locs
         for test in filter(lambda x: 'code' in x, self._tests):
             raw_code = test['code']
             title = test['title']
