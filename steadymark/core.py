@@ -91,10 +91,12 @@ class MarkdownTest(object):
 
         is_doctest = isinstance(self.code, DocTest)
         try:
+            import sure
             if is_doctest:
                 result = self._run_doctest()
             else:
                 result = self._run_raw()
+            sure
 
         except:
             failure = sys.exc_info()

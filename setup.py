@@ -38,7 +38,8 @@ def get_packages():
     return packages
 
 requirements = [
-          'misaka',
+    'misaka',
+    'sure'
 ]
 
 setup(name='steadymark',
