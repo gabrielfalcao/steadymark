@@ -21,10 +21,9 @@ clean:
 	@for pattern in `cat .gitignore`; do rm -rf $$pattern; find . -name "$$pattern" -exec rm -rf {} \;; done
 	@echo "OK!"
 
-release: test publish
+release: test
+	@./.release
+	@python setup.py sdist register upload
 	@printf "Exporting to $(filename)... "
 	@tar czf $(filename) steadymark setup.py README.md COPYING
 	@echo "DONE!"
-
-publish:
-	@python setup.py sdist register upload
