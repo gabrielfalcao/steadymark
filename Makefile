@@ -8,7 +8,7 @@ test: clean unit functional integration
 
 unit:
 	@echo "Running unit tests"
-	@nosetests --verbosity=2 -s tests/unit
+	@nosetests --rednose --verbosity=2 -s tests/unit
 
 functional:
 	@python steadymark/__init__.py

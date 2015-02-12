@@ -7,3 +7,4 @@ misaka==1.0.2
 nose==1.1.2
 sure==1.1.7
 tox==1.4.2
+rednose
