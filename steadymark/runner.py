@@ -161,7 +161,12 @@ class Runner(object):
         self.print_white(header)
         self.print_white("*" * header_length)
 
-        self.print_yellow(test.raw_code, indentation=2)
+        for number, line in enumerate(test.raw_code.splitlines(), start=1):
+            if line == exc_val.example.lineno:
+                self.print_red("{0}: {1}".format(number, line), indentation=2)
+            else:
+                self.print_yellow("{0}: {1}".format(number, line), indentation=2)
+
         print
 
     def report_test_result(self, test, failure, before, after):
