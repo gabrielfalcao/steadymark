@@ -38,23 +38,25 @@ def get_packages():
     return packages
 
 requirements = [
-    'misaka',
-    'sure'
+    'misaka+=2.0.0',
+    'sure==1.2.24',
+    'couleur==0.6.0',
 ]
 
+
 setup(name='steadymark',
-    version='0.5.6',
-    description=(u'Markdown-based test runner for python. '
-                 'Good for github projects'),
-    author=u'Gabriel Falcao',
-    author_email='gabriel@nacaolivre.org',
-    url='http://github.com/gabrielfalcao/steadymark',
-    packages=get_packages(),
-    install_requires=requirements,
-    entry_points={
-        'console_scripts': ['steadymark = steadymark:main'],
-        },
-    package_data={
-        'steadymark': ['COPYING', '*.md'],
-    },
+      version='0.6.0',
+      description=(u'Markdown-based test runner for python. '
+                   'Good for github projects'),
+      author=u'Gabriel Falcao',
+      author_email='gabriel@nacaolivre.org',
+      url='http://github.com/gabrielfalcao/steadymark',
+      packages=get_packages(),
+      install_requires=requirements,
+      entry_points={
+          'console_scripts': ['steadymark = steadymark:main'],
+      },
+      package_data={
+          'steadymark': ['COPYING', '*.md'],
+      },
 )
