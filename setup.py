@@ -45,7 +45,7 @@ requirements = [
 
 
 setup(name='steadymark',
-      version='0.5.6',
+      version='0.6.0',
       description=(u'Markdown-based test runner for python. '
                    'Good for github projects'),
       author=u'Gabriel Falcao',
