@@ -38,14 +38,14 @@ def get_packages():
     return packages
 
 requirements = [
-    'misaka+=2.0.0',
+    'misaka==2.0.0',
     'sure==1.2.24',
     'couleur==0.6.0',
 ]
 
 
 setup(name='steadymark',
-      version='0.6.0',
+      version='0.5.6',
       description=(u'Markdown-based test runner for python. '
                    'Good for github projects'),
       author=u'Gabriel Falcao',
@@ -58,5 +58,4 @@ setup(name='steadymark',
       },
       package_data={
           'steadymark': ['COPYING', '*.md'],
-      },
-)
+      })
