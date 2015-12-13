@@ -115,7 +115,7 @@ class SteadyMark(BaseRenderer):
         self.locs = locals()
         return text_type(text)
 
-    def block_code(self, code, language):
+    def blockcode(self, code, language):
         if language != 'python':
             return
 
@@ -170,9 +170,11 @@ class SteadyMark(BaseRenderer):
         self.tests = tests
 
     @classmethod
-    def inspect(cls, markdown):
+    def inspect(cls, raw):
         renderer = cls()
+        markdown = renderer.preprocess(raw)
         extensions = EXT_FENCED_CODE | EXT_NO_INTRA_EMPHASIS
         md = Markdown(renderer, extensions=extensions)
-        md.render(markdown)
+        full = md(markdown)
+        renderer.postprocess(full)
         return renderer
