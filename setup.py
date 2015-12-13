@@ -40,7 +40,7 @@ def get_packages():
 requirements = [
     'misaka==2.0.0',
     'sure==1.2.24',
-    'couleur==0.6.0',
+    'couleur==0.6.2',
 ]
 
 
