@@ -40,12 +40,12 @@ def get_packages():
 requirements = [
     'misaka==2.0.0',
     'sure==1.2.24',
-    'couleur==0.6.0',
+    'couleur==0.7.0',
 ]
 
 
 setup(name='steadymark',
-      version='0.6.0',
+      version='0.7.0',
       description=(u'Markdown-based test runner for python. '
                    'Good for github projects'),
       author=u'Gabriel Falcao',
