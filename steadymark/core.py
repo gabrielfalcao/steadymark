@@ -47,6 +47,8 @@ from steadymark.six import text_type
 class SteadyMarkDoctestRunner(DebugRunner):
     def report_unexpected_exception(self, out, test, example, exc_info):
         exc_type, exc_val, tb = exc_info
+        exc_val.example = example
+
         if exc_type is DocTestFailure:
             raise exc_info
         raise exc_val

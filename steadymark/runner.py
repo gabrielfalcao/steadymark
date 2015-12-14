@@ -46,6 +46,14 @@ if not PY3:
     sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 
+def extract_example(exc, attribute_name):
+    example = getattr(exc, 'example', None)
+    if not example:
+        return
+
+    return getattr(exc, attribute_name, None)
+
+
 class Runner(object):
     def __init__(self, filename=None, text=u''):
         if filename and not os.path.exists(filename):
@@ -139,16 +147,17 @@ class Runner(object):
 
         if exc_type is DocTestFailure:
             formatted_tb = u"the line {0}: {1}\n".format(
-                exc_val.example.lineno,
-                exc_val.example.source,
+                extract_example(exc_val, 'lineno'),
+                extract_example(exc_val, 'source'),
             )
-            if exc_val.example.exc_msg:
+            if extract_example(exc_val, 'exc_msg'):
                 formatted_tb += "{0}\n".format(
-                    exc_val.example.exc_msg)
+                    extract_example(exc_val, 'exc_msg')
+                )
             else:
                 formatted_tb += ("resulted in:\n{0}\n"
                                  "when expecting:\n{1}\n".format(
-                                     exc_val.got, exc_val.example.want))
+                                     exc_val.got, extract_example(exc_val, 'want')))
 
         else:
             formatted_tb = self.format_traceback(test, failure)
@@ -162,7 +171,7 @@ class Runner(object):
         self.print_white("*" * header_length)
 
         for number, line in enumerate(test.raw_code.splitlines(), start=1):
-            if line == exc_val.example.lineno:
+            if line == extract_example(exc_val, 'lineno'):
                 self.print_red("{0}: {1}".format(number, line), indentation=2)
             else:
                 self.print_yellow("{0}: {1}".format(number, line), indentation=2)
