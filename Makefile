@@ -24,9 +24,8 @@ $(VENV)/bin/sphinx-build $(VENV)/bin/twine $(VENV)/bin/nosetests $(VENV)/bin/pyt
 	$(VENV)/bin/pip install -r development.txt
 	$(VENV)/bin/pip install -e .
 
-# Runs the unit and integration tests
-tests: $(VENV)/bin/nosetests  # runs all tests
-	$(VENV)/bin/nosetests tests --with-random --cover-erase
+
+tests: unit integration
 
 tdd: $(VENV)/bin/nosetests  # runs all tests
 	$(VENV)/bin/nosetests tests --with-watch --cover-erase

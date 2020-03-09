@@ -121,11 +121,11 @@ class Runner(object):
         )
 
     def report_success(self, test, shift, ms):
-        self.print_green("\\u2714 {0}".format(ms))
+        self.print_green("\u2714 {0}".format(ms))
         print()
 
     def report_failure(self, test, failure, shift, ms):
-        self.print_red("\\u2718 {0}".format(ms))
+        self.print_red("\u2718 {0}".format(ms))
         exc_type, exc_val, exc_tb = failure
 
         if exc_type is DocTestFailure:

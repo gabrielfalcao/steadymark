@@ -1,4 +1,1 @@
-print("AWESOME SAUCE")
-import sys
-
-sys.exit(42)
+raise SystemExit(42)

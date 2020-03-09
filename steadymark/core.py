@@ -31,7 +31,6 @@ import sys
 from doctest import DocTestParser, DocTest, DebugRunner, DocTestFailure
 from datetime import datetime
 from misaka import BaseRenderer, Markdown, EXT_FENCED_CODE, EXT_NO_INTRA_EMPHASIS
-from steadymark.six import text_type
 
 
 class SteadyMarkDoctestRunner(DebugRunner):
@@ -106,7 +105,7 @@ class SteadyMark(BaseRenderer):
         self._tests = [{}]
         self.globs = globals()
         self.locs = locals()
-        return text_type(text)
+        return str(text)
 
     def blockcode(self, code, language):
         if language != "python":
@@ -135,14 +134,14 @@ class SteadyMark(BaseRenderer):
             item = self._tests[-1]
 
         else:
-            item["code"] = text_type(code).strip()
+            item["code"] = str(code).strip()
 
         if "title" not in item:
             item["title"] = "Test #{0}".format(len(self._tests))
             self._tests.append({})
 
     def header(self, title, level):
-        t = text_type(title)
+        t = str(title)
         t = re.sub(r"^[# ]*(.*)", r"\g<1>", t)
         t = re.sub(r"`([^`]*)`", r"\033[1;33m\g<1>\033[0m", t)
         self._tests.append({"title": t, "level": int(level)})

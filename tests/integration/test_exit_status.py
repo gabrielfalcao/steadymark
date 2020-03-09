@@ -45,7 +45,7 @@ def test_failure_exits_with_1():
     ("SteadyMark should exit with status 1 in case of failure")
 
     path = join(CURDIR, "fails.md")
-    run.when.called_with(path).should.throw(CalledProcessError, "exit status 1")
+    run.when.called_with(path).should.have.raised(CalledProcessError, "exit status 1")
 
 
 def test_success_exits_with_0():
@@ -59,6 +59,6 @@ def test_import_boot_file():
     ("SteadyMark should be able to import a python file before running the tests")
 
     path = join(CURDIR, "passes.md")
-    run.when.called_with(path, "-b", join(CURDIR, "firstboot.py")).should.throw(
+    run.when.called_with(path, "-b", join(CURDIR, "firstboot.py")).should.have.raised(
         CalledProcessError, "exit status 42"
     )

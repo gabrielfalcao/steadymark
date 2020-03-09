@@ -26,7 +26,6 @@
 
 import imp
 from optparse import OptionParser
-from steadymark.six import text_type
 from steadymark.version import version
 from steadymark.runner import Runner
 
