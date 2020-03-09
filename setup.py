@@ -54,7 +54,7 @@ def read_version():
     return finder.version
 
 
-requirements = ["misaka>=2.1.1", "couleur>=0.7.0"]
+requirements = ["misaka>=2.1.1", "couleur>=0.7.1"]
 
 
 setup(
