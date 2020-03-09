@@ -62,7 +62,7 @@ setup(
     version=read_version(),
     description=("Markdown-based test runner for python. " "Good for github projects"),
     long_description=local_file("README.md"),
-    long_description_content_type='text/markdown'
+    long_description_content_type="text/markdown",
     author="Gabriel Falcao",
     author_email="gabriel@nacaolivre.org",
     url="http://github.com/gabrielfalcao/steadymark",
@@ -78,5 +78,4 @@ setup(
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License",
     ],
-
 )

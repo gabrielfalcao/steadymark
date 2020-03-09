@@ -22,7 +22,7 @@ $(VENV)/bin/steadymark $(VENV)/bin/sphinx-build $(VENV)/bin/twine $(VENV)/bin/no
 	$(VENV)/bin/pip install -e .
 
 
-tests: unit integration
+tests: unit integration docs
 
 tdd: $(VENV)/bin/nosetests  # runs all tests
 	$(VENV)/bin/nosetests tests --with-watch --cover-erase
@@ -35,7 +35,7 @@ dependencies: | $(VENV)/bin/nosetests
 unit: $(VENV)/bin/nosetests  # runs only unit tests
 	$(VENV)/bin/nosetests --cover-erase tests/unit
 
-docs:
+docs: $(VENV)/bin/steadymark
 	$(VENV)/bin/steadymark README.md
 
 # runs integration tests
