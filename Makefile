@@ -1,12 +1,9 @@
-.PHONY: tests all unit integration clean dependencies tdd docs html purge dist
+.PHONY: tests all unit integration clean dependencies tdd html purge dist
 
 GIT_ROOT		:= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-DOCS_ROOT		:= $(GIT_ROOT)/docs
-HTML_ROOT		:= $(DOCS_ROOT)/build/html
 VENV_ROOT		:= $(GIT_ROOT)/.venv
 VENV			?= $(VENV_ROOT)
 BENTO_BIN		:= $(shell which bento)
-DOCS_INDEX		:= $(HTML_ROOT)/index.html
 BENTO_EMAIL		:= gabriel@nacaolivre.org
 
 export VENV
@@ -42,14 +39,6 @@ unit: $(VENV)/bin/nosetests  # runs only unit tests
 integration: $(VENV)/bin/nosetests  # runs integration tests
 	$(VENV)/bin/nosetests tests/integration
 
-
-$(DOCS_INDEX): | $(VENV)/bin/sphinx-build
-	cd docs && make html
-
-html: $(DOCS_INDEX)
-
-docs: $(DOCS_INDEX)
-	open $(DOCS_INDEX)
 
 release: | clean bento unit integration tests html
 	@rm -rf dist/*
