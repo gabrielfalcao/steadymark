@@ -69,4 +69,13 @@ setup(
     install_requires=requirements,
     entry_points={"console_scripts": ["steadymark = steadymark:main"]},
     package_data={"steadymark": ["COPYING", "*.md"]},
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "License :: OSI Approved :: Apache Software License",
+        "Operating System :: POSIX",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+    ],
+
 )
