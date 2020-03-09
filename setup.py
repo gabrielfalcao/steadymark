@@ -1,7 +1,7 @@
 # #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # <steadymark - markdown-based test runner for python>
-# Copyright (C) <2010>  Gabriel Falcão <gabriel@nacaolivre.org>
+# Copyright (C) <2012-2020>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -24,38 +24,48 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
+import ast
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
-def get_packages():
-    # setuptools can't do the job :(
-    packages = []
-    for root, dirnames, filenames in os.walk('steadymark'):
-        if '__init__.py' in filenames:
-            packages.append(".".join(os.path.split(root)).strip("."))
-
-    return packages
-
-requirements = [
-    'misaka==2.0.0',
-    'sure==1.2.24',
-    'couleur==0.6.2',
-]
+def local_file(*f):
+    with open(os.path.join(os.path.dirname(__file__), *f), "r") as fd:
+        return fd.read()
 
 
-setup(name='steadymark',
-      version='0.7.3',
-      description=(u'Markdown-based test runner for python. '
-                   'Good for github projects'),
-      author=u'Gabriel Falcao',
-      author_email='gabriel@nacaolivre.org',
-      url='http://github.com/gabrielfalcao/steadymark',
-      packages=get_packages(),
-      install_requires=requirements,
-      entry_points={
-          'console_scripts': ['steadymark = steadymark:main'],
-      },
-      package_data={
-          'steadymark': ['COPYING', '*.md'],
-      })
+class VersionFinder(ast.NodeVisitor):
+    VARIABLE_NAME = "version"
+
+    def __init__(self):
+        self.version = None
+
+    def visit_Assign(self, node):
+        try:
+            if node.targets[0].id == self.VARIABLE_NAME:
+                self.version = node.value.s
+        except Exception:
+            self.version = None
+
+
+def read_version():
+    finder = VersionFinder()
+    finder.visit(ast.parse(local_file("steadymark", "version.py")))
+    return finder.version
+
+
+requirements = ["misaka>=2.1.1", "couleur>=0.7.0"]
+
+
+setup(
+    name="steadymark",
+    version=read_version(),
+    description=("Markdown-based test runner for python. " "Good for github projects"),
+    author="Gabriel Falcao",
+    author_email="gabriel@nacaolivre.org",
+    url="http://github.com/gabrielfalcao/steadymark",
+    packages=find_packages(exclude=["*tests*"]),
+    install_requires=requirements,
+    entry_points={"console_scripts": ["steadymark = steadymark:main"]},
+    package_data={"steadymark": ["COPYING", "*.md"]},
+)

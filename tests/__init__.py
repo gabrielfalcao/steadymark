@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # <steadymark - markdown-based test runner for python>
-# Copyright (C) <2012>  Gabriel Falcão <gabriel@nacaolivre.org>
+# Copyright (C) <2012-2020>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation

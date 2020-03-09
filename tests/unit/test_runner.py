@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # <steadymark - markdown-based test runner for python>
-# Copyright (C) <2012>  Gabriel Falcão <gabriel@nacaolivre.org>
+# Copyright (C) <2012-2020>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -23,17 +23,15 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-from __future__ import unicode_literals
+
 
 from steadymark.core import SteadyMark
-from steadymark.six import text_type
 
 
 def test_find_doctest_code_with_titles():
-    (u"SteadyMark should find doctest and use the "
-     "previous header as title")
+    ("SteadyMark should find doctest and use the " "previous header as title")
 
-    md = u"""# test 1
+    md = """# test 1
 a paragraph
 
 ```python
@@ -47,14 +45,13 @@ a paragraph
 
     test1.title.should.equal("test 1")
     failure.should.be.a(TypeError)
-    "boom".should.be.within(text_type(failure))
+    "boom".should.be.within(str(failure))
 
 
 def test_find_python_code_with_titles():
-    (u"SteadyMark should find python code and use the "
-     "previous header as title")
+    ("SteadyMark should find python code and use the " "previous header as title")
 
-    md = u"""# test 1
+    md = """# test 1
 a paragraph
 
 ```python
@@ -68,13 +65,13 @@ raise ValueError('boom')
 
     test1.title.should.equal("test 1")
     failure.should.be.a(ValueError)
-    "boom".should.be.within(text_type(failure))
+    "boom".should.be.within(str(failure))
 
 
 def test_keeps_scope_from_test_to_test():
-    (u"SteadyMark should accumulate the scope throughout the python code snippets")
+    ("SteadyMark should accumulate the scope throughout the python code snippets")
 
-    md = u"""# test 1
+    md = """# test 1
 a paragraph
 
 ```python

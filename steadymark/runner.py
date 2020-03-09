@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # <steadymark - markdown-based test runner for python>
-# Copyright (C) <2012>  Gabriel Falcão <gabriel@nacaolivre.org>
+# Copyright (C) <2012-2020>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -23,7 +23,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-from __future__ import unicode_literals
+
 
 import os
 import sys
@@ -35,19 +35,11 @@ try:
 except ImportError:
     SUPPORTS_ANSI = False
 
-from steadymark.core import (
-    SteadyMark,
-    DocTestFailure,
-)
-from steadymark.six import text_type, PY3
-
-if not PY3:
-    # We do this so that redirecting to pipes will work
-    sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+from steadymark.core import SteadyMark, DocTestFailure
 
 
 def extract_example(exc, attribute_name):
-    example = getattr(exc, 'example', None)
+    example = getattr(exc, "example", None)
     if not example:
         return
 
@@ -55,60 +47,56 @@ def extract_example(exc, attribute_name):
 
 
 class Runner(object):
-    def __init__(self, filename=None, text=u''):
+    def __init__(self, filename=None, text=""):
         if filename and not os.path.exists(filename):
-            print('steadymark could not find {0}'.format(filename))
+            print(("steadymark could not find {0}".format(filename)))
             sys.exit(1)
 
         if filename:
-            raw_md = codecs.open(filename, 'rb', 'utf-8').read()
-            text = text_type(raw_md)
+            raw_md = codecs.open(filename, "rb", "utf-8").read()
+            text = str(raw_md)
 
         self.steadymark = SteadyMark.inspect(text)
         self.filename = filename
         self.text = text
 
     def print_white(self, text, indentation=0):
-        white = {
-            True: u'\033[1;37m',
-            False: u'',
-        }
+        white = {True: "\033[1;37m", False: ""}
         for line in text.splitlines():
-            print("{1}{2}{0}\033[0m".format(
-                line, ' ' * indentation, white[SUPPORTS_ANSI]))
+            print(
+                (
+                    "{1}{2}{0}\033[0m".format(
+                        line, " " * indentation, white[SUPPORTS_ANSI]
+                    )
+                )
+            )
 
     def __getattr__(self, attr):
-        if attr not in (
-            'print_white',
-            'print_green',
-            'print_red',
-            'print_yellow',
-        ):
+        if attr not in ("print_white", "print_green", "print_red", "print_yellow"):
             return super(Runner, self).__getattribute__(attr)
 
         color_for = {
-            'print_white': u'\033[1;37m',
-            'print_red': u'\033[1;31m',
-            'print_green': u'\033[1;32m',
-            'print_yellow': u'\033[1;33m',
+            "print_white": "\033[1;37m",
+            "print_red": "\033[1;31m",
+            "print_green": "\033[1;32m",
+            "print_yellow": "\033[1;33m",
         }
         ansi = color_for[attr]
         if SUPPORTS_ANSI:
             color = ansi
-            no_color = '\033[0m'
+            no_color = "\033[0m"
         else:
-            no_color = color = ''
+            no_color = color = ""
 
         def printer(text, indentation=0):
             for line in text.splitlines():
-                print("{1}{2}{0}{3}".format(
-                    line, ' ' * indentation, color, no_color))
+                print(("{1}{2}{0}{3}".format(line, " " * indentation, color, no_color)))
 
         return printer
 
     def format_ms(self, ms):
         ms = int(ms)
-        base = '{0}ms'.format(ms)
+        base = "{0}ms".format(ms)
         if SUPPORTS_ANSI:
             return "\033[1;33m{0}\033[0m".format(base)
         else:
@@ -118,46 +106,38 @@ class Runner(object):
         exc, exc_instance, tb = failure
         # formatted_tb = traceback.format_exc(exc_instance).strip()
         # if 'None' == formatted_tb:
-        formatted_tb = ''.join(traceback.format_tb(tb))
+        formatted_tb = "".join(traceback.format_tb(tb))
         formatted_tb = formatted_tb.replace(
-            u'File "{0}"'.format(test.title),
-            u'In the test "{0}"'.format(test.title),
+            'File "{0}"'.format(test.title), 'In the test "{0}"'.format(test.title)
         )
-        formatted_tb = formatted_tb.replace(
-            u'@STEADYMARK@', text_type(test.title))
+        formatted_tb = formatted_tb.replace("@STEADYMARK@", str(test.title))
 
         if SUPPORTS_ANSI:
-            color = '\033[1;36m'
+            color = "\033[1;36m"
         else:
-            color = ''
-        return u'{0} {3}{1}\n{2}\n'.format(
-            exc.__name__,
-            exc_instance,
-            formatted_tb,
-            color,
+            color = ""
+        return "{0} {3}{1}\n{2}\n".format(
+            exc.__name__, exc_instance, formatted_tb, color
         )
 
     def report_success(self, test, shift, ms):
-        self.print_green('\u2714 {0}'.format(ms))
-        print
+        self.print_green("\\u2714 {0}".format(ms))
+        print()
 
     def report_failure(self, test, failure, shift, ms):
-        self.print_red('\u2718 {0}'.format(ms))
+        self.print_red("\\u2718 {0}".format(ms))
         exc_type, exc_val, exc_tb = failure
 
         if exc_type is DocTestFailure:
-            formatted_tb = u"the line {0}: {1}\n".format(
-                extract_example(exc_val, 'lineno'),
-                extract_example(exc_val, 'source'),
+            formatted_tb = "the line {0}: {1}\n".format(
+                extract_example(exc_val, "lineno"), extract_example(exc_val, "source")
             )
-            if extract_example(exc_val, 'exc_msg'):
-                formatted_tb += "{0}\n".format(
-                    extract_example(exc_val, 'exc_msg')
-                )
+            if extract_example(exc_val, "exc_msg"):
+                formatted_tb += "{0}\n".format(extract_example(exc_val, "exc_msg"))
             else:
-                formatted_tb += ("resulted in:\n{0}\n"
-                                 "when expecting:\n{1}\n".format(
-                                     exc_val.got, extract_example(exc_val, 'want')))
+                formatted_tb += "resulted in:\n{0}\n" "when expecting:\n{1}\n".format(
+                    exc_val.got, extract_example(exc_val, "want")
+                )
 
         else:
             formatted_tb = self.format_traceback(test, failure)
@@ -171,12 +151,12 @@ class Runner(object):
         self.print_white("*" * header_length)
 
         for number, line in enumerate(test.raw_code.splitlines(), start=1):
-            if line == extract_example(exc_val, 'lineno'):
+            if line == extract_example(exc_val, "lineno"):
                 self.print_red("{0}: {1}".format(number, line), indentation=2)
             else:
                 self.print_yellow("{0}: {1}".format(number, line), indentation=2)
 
-        print
+        print()
 
     def report_test_result(self, test, failure, before, after):
         shift = before - after
@@ -189,20 +169,20 @@ class Runner(object):
 
     def run(self):
         if self.filename:
-            print("Running tests from {0}".format(self.filename))
+            print(("Running tests from {0}".format(self.filename)))
 
         exit_status = 0
         for test in self.steadymark.tests:
             title = "{0} ".format(test.title)
             title_length = len(title)
-            print("." * title_length)
+            print(("." * title_length))
             sys.stdout.write(title)
             result, failure, before, after = test.run()
             if failure:
                 exit_status = 1
             self.report_test_result(test, failure, before, after)
 
-        if exit_status is not 0:
+        if exit_status != 0:
             sys.exit(exit_status)
 
         return self.steadymark

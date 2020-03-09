@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # <steadymark - markdown-based test runner for python>
-# Copyright (C) <2012>  Gabriel Falcão <gabriel@nacaolivre.org>
+# Copyright (C) <2012-2020>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -23,17 +23,16 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-from __future__ import unicode_literals
+
 
 from sure import this
 from steadymark.core import SteadyMark
 
 
 def test_find_python_code_with_titles():
-    (u"SteadyMark should find python code and use the "
-     "previous header as title")
+    ("SteadyMark should find python code and use the " "previous header as title")
 
-    md = u"""# test 1
+    md = """# test 1
 a paragraph
 
 ```python
@@ -75,10 +74,9 @@ assert False, 'uh yeah'
 
 
 def test_find_inline_doctests_with_titles():
-    (u"SteadyMark should find docstrings and use the "
-     "previous header as title")
+    ("SteadyMark should find docstrings and use the " "previous header as title")
 
-    md = u"""# test 1
+    md = """# test 1
 a paragraph
 
 ```python
@@ -113,11 +111,11 @@ assert False, 'uh yeah'
     test1, test2 = sm.tests
 
     test1.title.should.equal("test 1")
-    test1.raw_code.should.equal(">>> x = 'doc'\n"
-                                ">>> y = 'test'\n"
-                                ">>> assert (x + y) == 'doctest'")
+    test1.raw_code.should.equal(
+        ">>> x = 'doc'\n" ">>> y = 'test'\n" ">>> assert (x + y) == 'doctest'"
+    )
 
-    this(test1.code).should.be.a('doctest.DocTest')
+    this(test1.code).should.be.a("doctest.DocTest")
     test1.run()
     test2.title.should.equal("test 2")
     test2.raw_code.should.equal("assert False, 'uh yeah'")
@@ -125,9 +123,9 @@ assert False, 'uh yeah'
 
 
 def test_use_same_title_for_all_tests():
-    (u"SteadyMark should find all the tests under the same header (title)")
+    ("SteadyMark should find all the tests under the same header (title)")
 
-    md = u"""# Test Foo
+    md = """# Test Foo
 a paragraph
 
 ```python
@@ -161,9 +159,9 @@ assert False, 'THIRD'
 
 
 def test_skip_tests_marked_with_ignore():
-    (u"SteadyMark should skip tests with the 'ignore' modeline")
+    ("SteadyMark should skip tests with the 'ignore' modeline")
 
-    md = u"""# My test
+    md = """# My test
 ```python
 # steadymark: ignore
 This should break, but it won't because steady mark will ignore this
@@ -177,4 +175,4 @@ This should break, but it won't because steady mark will ignore this
 """
     sm = SteadyMark.inspect(md)
     sm.tests.should.have.length_of(1)
-    sm.tests[0].title.should.be.equal('Another test')
+    sm.tests[0].title.should.be.equal("Another test")

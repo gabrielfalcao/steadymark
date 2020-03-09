@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # <steadymark - markdown-based test runner for python>
-# Copyright (C) <2012>  Gabriel Falcão <gabriel@nacaolivre.org>
+# Copyright (C) <2012-2020>  Gabriel Falcão <gabriel@nacaolivre.org>
 #
 # Permission is hereby granted, free of charge, to any person
 # obtaining a copy of this software and associated documentation
@@ -23,7 +23,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
-from __future__ import unicode_literals
+
 import imp
 from optparse import OptionParser
 from steadymark.six import text_type
@@ -39,21 +39,22 @@ def run(filenames):
 
 def main():
     parser = OptionParser()
-    parser.add_option("-b", "--bootstrap", dest="bootstrap_file",
-                  help="A path to a python file to be loaded before steadymark runs the tests")
+    parser.add_option(
+        "-b",
+        "--bootstrap",
+        dest="bootstrap_file",
+        help="A path to a python file to be loaded before steadymark runs the tests",
+    )
 
     (options, args) = parser.parse_args()
 
     if options.bootstrap_file:
-        imp.load_source('steadymark_bootstrap', options.bootstrap_file)
+        imp.load_source("steadymark_bootstrap", options.bootstrap_file)
 
-    run(args or ['README.md'])
+    run(args or ["README.md"])
 
-__all__ = [
-    'run',
-    'Runner',
-    'version',
-]
 
-if __name__ == '__main__':
+__all__ = ["run", "Runner", "version"]
+
+if __name__ == "__main__":
     main()

@@ -1,3 +1,4 @@
-print "AWESOME SAUCE"
+print("AWESOME SAUCE")
 import sys
+
 sys.exit(42)
