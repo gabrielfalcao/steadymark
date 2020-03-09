@@ -13,9 +13,6 @@ Steady Mark
 .. image:: https://img.shields.io/github/workflow/status/gabrielfalcao/steadymark/python-3.7?label=python%203.7
    :target: https://github.com/gabrielfalcao/steadymark/actions
 
-.. image:: https://img.shields.io/readthedocs/steadymark
-   :target: https://steadymark.readthedocs.io/
-
 .. image:: https://img.shields.io/github/license/gabrielfalcao/steadymark?label=Github%20License
    :target: https://github.com/gabrielfalcao/steadymark/blob/master/LICENSE
 
