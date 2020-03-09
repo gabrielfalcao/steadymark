@@ -81,11 +81,11 @@ you can tell steadymark to load a "boot" file before running the tests,
 it's very useful for hooking up [sure](http://falcao.it/sure) or
 [HTTPretty](http://falcao.it/HTTPretty)
 
-Steadymark is on version 0.8.2
+Steadymark is on version 0.8.3
 ==============================
 
 ```python
 >>> from sure import expect
 >>> from steadymark import version
->>> assert expect(version).should.equal("0.8.2")
+>>> assert expect(version).should.equal("0.8.3")
 ```
