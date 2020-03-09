@@ -121,11 +121,11 @@ you can tell steadymark to load a “boot” file before running the tests,
 it’s very useful for hooking up `sure <http://falcao.it/sure>`__ or
 `HTTPretty <http://falcao.it/HTTPretty>`__
 
-Steadymark is on version 0.7.4
+Steadymark is on version 0.8.0
 ==============================
 
 .. code:: python
 
    >>> from sure import expect
    >>> from steadymark import version
-   >>> assert expect(version).should.equal("0.7.4")
+   >>> assert expect(version).should.equal("0.8.0")
