@@ -61,6 +61,7 @@ setup(
     name="steadymark",
     version=read_version(),
     description=("Markdown-based test runner for python. " "Good for github projects"),
+    long_description=local_file("README.rst"),
     author="Gabriel Falcao",
     author_email="gabriel@nacaolivre.org",
     url="http://github.com/gabrielfalcao/steadymark",
