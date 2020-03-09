@@ -25,4 +25,4 @@
 # OTHER DEALINGS IN THE SOFTWARE.
 
 
-version = "0.7.3"
+version = "0.7.4"
