@@ -72,7 +72,6 @@ setup(
     package_data={"steadymark": ["COPYING", "*.md"]},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
-        "License :: OSI Approved :: Apache Software License",
         "Operating System :: POSIX",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
